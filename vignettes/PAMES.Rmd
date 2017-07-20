@@ -1,0 +1,75 @@
+---
+title: "PAMES"
+# author: "Dario Romagnoli"
+# date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PAMES}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+**PAMES** (*Purity Assessment through clonal MEthylation Sites*) is a tool developed 
+for estimating purity of tumor samples.
+The default process for data obtained with Illumina Methylation BeadChip 
+(450k or 27k) is characterized by two main steps:
+
+- [selection of informative CpG sites (`select_informative_sites`)]
+- estimation of purity (`compute_purity`)
+
+Data generated with Bisulphite Sequencing (BS) methods is a little different 
+requiring one previous additional steps:
+
+- reducing the data (`reduce_bs_data`)
+- [selection of informative CpG **islands** (`select_informative_islands`)]
+- estimation of purity (`compute_purity`)
+
+The "reducing" step converts beta values from different CpG sites 
+to a single beta value associated to the CpG island which CpG sites belong 
+to (CpG sites located outsite CpG islands are discared).
+
+Steps in square brakets "`[]`" are optional since pre-computed indexes are 
+available with the PAMES package.
+
+Please note that two different "selection" function exists for the different
+data type!
+
+## Examples
+
+Below are showed examples of the steps required to run the analysis 
+with different situations.
+
+### Illumina 450k using pre-computed informative CpG sites
+
+    compute_purity(BRCA_matrix, BRCA_sites)
+    
+### Illumina 27k (different genome version) computing a new set of informative CpG sites
+
+    cpg_sites <- select_informative_sites(tumor_matrix, control_matrix, 
+                                          genome="hg38")
+    tumor_purity <- compute_purity(tumor_matrix, cpg_sites)
+
+### Bisulphite Sequencing using pre-computed informative CpG islands
+
+    bs_brca_redux <- reduce_bs_data(bs_brca, cpg_sites_coord)
+    bs_brca_purity <- compute_purity(bs_brca_redux, brca_islands)
+    
+### Bisulphite Sequencing computing a new set of informative CpG islands
+
+Tip: "CpG island-reducing"" is a time consuming step so it's preferable to 
+perform it on one single matrix with tumor and normal samples (example below) 
+together and than to split the matrix.
+
+    |           | tumor1| tumor2| control1| control2|
+    |:----------|------:|------:|--------:|--------:|
+    |chr1-10470 |   0.98|   0.60|     0.80|     0.06|
+    |chr1-10472 |   0.55|   0.24|     0.26|     0.56|
+    |chr1-10485 |   0.60|   0.04|     0.10|     1.00|
+    |chr1-10497 |   0.69|   0.64|     0.57|     0.80|
+    
+
+    bs_gbm_redux <- reduce_bs_data(bs_brca, cpg_sites_coord)
+    bs_info_sites <- select_informative_islands(bs_brca_redux[, idx_tumor], 
+                                                bs_brca_redux[, idx_control])
+    bs_brca_purity <- compute_purity(bs_brca_redux, bs_info_sites)
+    
