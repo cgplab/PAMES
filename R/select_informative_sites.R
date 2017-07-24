@@ -32,7 +32,10 @@ select_informative_sites <- function(tumor,
     # check parameters ---------------------------------------------------------
     platform <- match.arg(platform)
     genome <- match.arg(genome)
-    platform_data <<- get(paste0("illumina", platform, ".", genome))
+    cat(sprintf("Platform: %s\n", platform))
+    cat(sprintf("Genome: %s\n", genome))
+
+    platform_data <- get(paste0("illumina", platform, "_", genome))
 
     min_distance <- as.integer(min_distance)
     if (min_distance < 0)
@@ -48,9 +51,9 @@ select_informative_sites <- function(tumor,
     if (any(tumor < 0 | tumor > 1, na.rm=T) | any(control < 0 | control > 1, na.rm=T))
         stop("Beta values in 'tumor' and 'control' matrixes must be decimal.")
 
-    if (nrow(tumor) == nrow(platform_data) | nrow(control) == nrow(platform_data))
+    if (nrow(tumor) != nrow(platform_data) | nrow(control) != nrow(platform_data))
         stop(paste0(sprintf("'tumor' and 'control' must have %i number of rows.\n", nrow(platform_data)),
-             "\tBe sure to use every 'cg' probe and remove any 'non-cg' probe."))
+             "Be sure to use every 'cg' probe and remove any 'non-cg' probe."))
 
     # compute AUC --------------------------------------------------------------
     full_table <- cbind(tumor, control)
