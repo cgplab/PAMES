@@ -10,17 +10,12 @@
 #' (set to 1 to avoid sites with any NA). Applied independently to each sites (row).
 #' @param max_sites Maximum number of sites to retrieve
 #' (divided in two sets: "hyper-" and "hypo-methylated")
-#' @param min_distance Measured in bp (base pair), used to avoid selection
-#' of CpG sites located within this distance from another.
-#' @param platform '27k' or '450k' Illumina HumanMethylation BeadChip.
-#' @param genome Currently support hg19 or hg38. Used to map probes to genome and
-#' remove heavly clusterd probes.
 #' @return A list indexes of informative sites (divided into two sets:
 #' "hyper-methylated" and "hypo-methylated")
-#' @export
 #' @examples
 #' select_informative_sites(tumor_matrix, control_matrix)
 #' select_informative_sites(tumor_matrix, control_matrix, max_sites=40, min_distance=5000)
+#' @export
 
 select_informative_islands <- function(tumor, control,
                                        max_NAs_fraction=0.5, max_sites=20){
@@ -39,7 +34,7 @@ select_informative_islands <- function(tumor, control,
     # compute AUC --------------------------------------------------------------
     full_table <- cbind(tumor, control)
     state <- c(rep(1, ncol(tumor)), rep(0, ncol(control)))
-    cat(sprintf("[%s] Computing AUC...\n",  Sys.time()))
+    message(sprintf("[%s] Computing AUC...",  Sys.time()))
     auc <- apply(full_table, 1, function(meth_site){
         NAs_tumor   <- (too_many_NAs(meth_site[state==1], max_NAs_fraction))
         NAs_control <- (too_many_NAs(meth_site[state==0], max_NAs_fraction))
@@ -54,7 +49,7 @@ select_informative_islands <- function(tumor, control,
         }
         return(ans)
     })
-    cat(sprintf("[%s] Done.\n",  Sys.time()))
+    message(sprintf("[%s] Done.",  Sys.time()))
 
     # compute beta-differences -------------------------------------------------
     tumor_median    <- apply(tumor, 1, median, na.rm=T)
@@ -70,18 +65,18 @@ select_informative_islands <- function(tumor, control,
     hyper_idx <- which(beta_min < .40 & beta_max > .90 & auc > .80)
     hypo_idx  <- which(beta_min < .10 & beta_max > .60 & auc < .20)
 
-    cat(sprintf("[%s] Total hyper-methylated sites = %i\n", Sys.time(), length(hyper_idx)))
-    cat(sprintf("[%s] Total hypo-methylated sites = %i\n",  Sys.time(), length(hypo_idx)))
+    message(sprintf("[%s] Total hyper-methylated sites = %i", Sys.time(), length(hyper_idx)))
+    message(sprintf("[%s] Total hypo-methylated sites = %i",  Sys.time(), length(hypo_idx)))
 
     ordered.hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing=T)]
     ordered.hypo_idx  <- hypo_idx[order(auc[hypo_idx], decreasing=F)]
 
     top_hyper_idx <- ordered.hyper_idx[seq(max_sites/2)]
-    cat(sprintf("[%s] Hyper-sites selection: %i\n", Sys.time(),
+    message(sprintf("[%s] Hyper-sites selection: %i", Sys.time(),
                 length(na.omit(top_hyper_idx))))
 
     top_hypo_idx <- ordered.hypo_idx[seq(max_sites/2)]
-    cat(sprintf("[%s] Hypo-sites selection: %i\n", Sys.time(),
+    message(sprintf("[%s] Hypo-sites selection: %i", Sys.time(),
                 length(na.omit(top_hypo_idx))))
 
     list(hyper=top_hyper_idx, hypo=top_hypo_idx)

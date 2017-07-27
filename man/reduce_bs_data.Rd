@@ -9,11 +9,11 @@ reduce_bs_data(bs_data, sites_df, islands_df = cpg_islands)
 \arguments{
 \item{bs_data}{a matrix of beta values from Bisulphite Sequencing data}
 
-\item{cpg_site_df}{a data.frame with the location of CpG sites from Bisulphite
+\item{site_df}{a data.frame with the location of CpG sites from Bisulphite
 Sequencing data. Requires two columns, "chr" and "pos" (respectively,
 chromosome - in the form `chr1` and 1-based coordinate of CpG site).}
 
-\item{cpg_island_df}{a data.frame with location of CpG islands. Set to "default"
+\item{island_df}{a data.frame with location of CpG islands. Set to "default"
 to use default one or provide a different one. Must contain "chr", "start",
 "end" (1-based coordinates).}
 }

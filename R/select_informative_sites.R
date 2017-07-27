@@ -27,13 +27,13 @@ select_informative_sites <- function(tumor,
                                      max_NAs_fraction=0.5,
                                      max_sites=20,
                                      min_distance=1e6,
-                                     platform=c("450k", "27k"),
-                                     genome=c("hg19", "hg38")){
+                                     genome=c("hg19", "hg38"),
+                                     platform=c("450k", "27k")){
     # check parameters ---------------------------------------------------------
     platform <- match.arg(platform)
     genome <- match.arg(genome)
-    cat(sprintf("Platform: %s\n", platform))
-    cat(sprintf("Genome: %s\n", genome))
+    message(sprintf("Genome: %s", genome))
+    message(sprintf("Platform: %s", platform))
 
     platform_data <- get(paste0("illumina", platform, "_", genome))
 
@@ -58,22 +58,22 @@ select_informative_sites <- function(tumor,
     # compute AUC --------------------------------------------------------------
     full_table <- cbind(tumor, control)
     state <- c(rep(1, ncol(tumor)), rep(0, ncol(control)))
-    cat(sprintf("[%s] Computing AUC...\n",  Sys.time()))
-    auc <- apply(full_table, 1, function(meth_site){
-        NAs_tumor   <- (too_many_NAs(meth_site[state==1], max_NAs_fraction))
-        NAs_control <- (too_many_NAs(meth_site[state==0], max_NAs_fraction))
+    message(sprintf("[%s] Computing AUC...",  Sys.time()))
+    auc <- apply(full_table, 1, function(site){
+        NAs_tumor   <- (too_many_NAs(site[state==1], max_NAs_fraction))
+        NAs_control <- (too_many_NAs(site[state==0], max_NAs_fraction))
         if (NAs_tumor | NAs_control) {
             ans <- NA
         } else {
-            non_NA_idx <- which(!is.na(meth_site))
+            non_NA_idx <- which(!is.na(site))
             roc <- ROC::rocdemo.sca(truth=state[non_NA_idx],
-                                    data=meth_site[non_NA_idx],
+                                    data=site[non_NA_idx],
                                     cutpts=seq(0, 1, .01))
             ans <- ROC::AUC(roc)
         }
         return(ans)
     })
-    cat(sprintf("[%s] Done.\n",  Sys.time()))
+    message(sprintf("[%s] Done.",  Sys.time()))
 
     # compute beta-differences -------------------------------------------------
     tumor_median    <- apply(tumor, 1, median, na.rm=T)
@@ -89,19 +89,17 @@ select_informative_sites <- function(tumor,
     hyper_idx <- which(beta_min < .40 & beta_max > .90 & auc > .80)
     hypo_idx  <- which(beta_min < .10 & beta_max > .60 & auc < .20)
 
-    cat(sprintf("[%s] Total hyper-methylated sites = %i\n", Sys.time(), length(hyper_idx)))
-    cat(sprintf("[%s] Total hypo-methylated sites = %i\n",  Sys.time(), length(hypo_idx)))
+    message(sprintf("[%s] Total hyper-methylated sites = %i", Sys.time(), length(hyper_idx)))
+    message(sprintf("[%s] Total hypo-methylated sites = %i",  Sys.time(), length(hypo_idx)))
 
     ordered.hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing=T)]
     ordered.hypo_idx  <- hypo_idx[order(auc[hypo_idx], decreasing=F)]
 
-    cat(sprintf("[%s] Hyper-sites selection: ", Sys.time()))
-    top_hyper_idx <- clusters_reduction(ordered.hyper_idx, N=max_sites/2, min_dist=min_distance)
+    message(sprintf("[%s] Hyper-methylated sites cluster reduction...", Sys.time()))
+    top_hyper_idx <- clusters_reduction(ordered.hyper_idx, max_sites/2, min_distance, platform_data)
+    message(sprintf("[%s] Hypo-methylated sites cluster reduction...", Sys.time()))
+    top_hypo_idx <- clusters_reduction(ordered.hypo_idx, max_sites/2, min_distance, platform_data)
 
-    cat(sprintf("[%s] Hypo-sites selection: ", Sys.time()))
-    top_hypo_idx <- clusters_reduction(ordered.hypo_idx, N=max_sites/2, min_dist=min_distance)
-
-    rm(platform_data, envir=.GlobalEnv)
     list(hyper=top_hyper_idx, hypo=top_hypo_idx)
 }
 
@@ -126,26 +124,27 @@ too_many_NAs <- function(x, threshold){ #
 
 #' Avoid retrieving of CpG sites too close to each others
 #'
-#' Remove sites within 'min_dist' (keep only one, per "cluster"), keeping at most N sites
+#' Remove sites within 'min_distance' (keep only one, per "cluster"), keeping at most N sites
 #' @param sites_idx a vector of integers
 #' @param N number of sites to retrieve
-#' @param min_dist an integer. Distance in basepairs
+#' @param min_distance an integer. Distance in basepairs
 #' @keywords internal
 #' @return a vector of indexes with close sites removed.
-clusters_reduction <- function(sites_idx, N, min_dist){
+clusters_reduction <- function(sites_idx, N, min_distance, platform_data){
     top_idx <- rep(NA, length(sites_idx))
     i <- 1
     n <- 1
     while (n <= N & i <= length(sites_idx)) {
         idx <- sites_idx[i]
-        if (!too_close(idx, top_idx[!is.na(top_idx)], min_dist)) {
+        if (!too_close(idx, top_idx[!is.na(top_idx)], min_distance)) {
             top_idx[n] <- idx
             n <- n + 1
         }
         i <- i+1
     }
     top_idx <- top_idx[!is.na(top_idx)]
-    cat(sprintf("%i sites retrieved after 'cluster reduction'.\n", length(top_idx)))
+    message(sprintf("[%s] %i sites retrieved after 'cluster reduction'.",
+                    Sys.time(), length(top_idx)))
     return(top_idx)
 }
 
@@ -153,13 +152,13 @@ clusters_reduction <- function(sites_idx, N, min_dist){
 #'
 #' Used in "cluster_recution" function only, given the index of a CpG site and
 #' a set of indexes of other sites, check if last added site is less than
-#' "d" basepair distant from previously retrieved sites.
+#' "min_distance" basepair distant from previously retrieved sites.
 #' @param new_idx an index (integer)
 #' @param other_idxs a vector of indexes (integer)
-#' @param d an integer. Distance in basepairs
+#' @param min_distance an integer. Distance in basepairs
 #' @keywords internal
 #' @return logical
-too_close <- function(new_idx, other_idxs, d){
+too_close <- function(new_idx, other_idxs, min_distance, platform_data){
     if (length(other_idxs) == 0) {
         answer <- FALSE
     } else {
@@ -167,10 +166,10 @@ too_close <- function(new_idx, other_idxs, d){
         other_sites <- platform_data[other_idxs,]
         same_chromosome <- other_sites[["Chromosome"]] == new_site[["Chromosome"]]
         if ("Start" %in% names(platform_data)){
-            within_min_distance <- abs(other_sites[["Start"]] - new_site[["Start"]]) < d
+            within_min_distance <- abs(other_sites[["Start"]] - new_site[["Start"]]) < min_distance
         } else {
             within_min_distance <-
-                abs(other_sites[["Genomic_Coordinate"]] - new_site[["Genomic_Coordinate"]]) < d
+                abs(other_sites[["Genomic_Coordinate"]] - new_site[["Genomic_Coordinate"]]) < min_distance
 
         }
         # pairwise comparision of chromosome location and distance

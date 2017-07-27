@@ -4,19 +4,19 @@
 \alias{clusters_reduction}
 \title{Avoid retrieving of CpG sites too close to each others}
 \usage{
-clusters_reduction(sites_idx, N, min_dist)
+clusters_reduction(sites_idx, N, min_distance, platform_data)
 }
 \arguments{
 \item{sites_idx}{a vector of integers}
 
 \item{N}{number of sites to retrieve}
 
-\item{min_dist}{an integer. Distance in basepairs}
+\item{min_distance}{an integer. Distance in basepairs}
 }
 \value{
 a vector of indexes with close sites removed.
 }
 \description{
-Remove sites within 'min_dist' (keep only one, per "cluster"), keeping at most N sites
+Remove sites within 'min_distance' (keep only one, per "cluster"), keeping at most N sites
 }
 \keyword{internal}

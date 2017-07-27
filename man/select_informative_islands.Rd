@@ -17,14 +17,6 @@ select_informative_islands(tumor, control, max_NAs_fraction = 0.5,
 
 \item{max_sites}{Maximum number of sites to retrieve
 (divided in two sets: "hyper-" and "hypo-methylated")}
-
-\item{min_distance}{Measured in bp (base pair), used to avoid selection
-of CpG sites located within this distance from another.}
-
-\item{platform}{'27k' or '450k' Illumina HumanMethylation BeadChip.}
-
-\item{genome}{Currently support hg19 or hg38. Used to map probes to genome and
-remove heavly clusterd probes.}
 }
 \value{
 A list indexes of informative sites (divided into two sets:

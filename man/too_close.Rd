@@ -4,14 +4,14 @@
 \alias{too_close}
 \title{Check whether a site is too close to the other sites or not.}
 \usage{
-too_close(new_idx, other_idxs, d)
+too_close(new_idx, other_idxs, min_distance, platform_data)
 }
 \arguments{
 \item{new_idx}{an index (integer)}
 
 \item{other_idxs}{a vector of indexes (integer)}
 
-\item{d}{an integer. Distance in basepairs}
+\item{min_distance}{an integer. Distance in basepairs}
 }
 \value{
 logical
@@ -19,6 +19,6 @@ logical
 \description{
 Used in "cluster_recution" function only, given the index of a CpG site and
 a set of indexes of other sites, check if last added site is less than
-"d" basepair distant from previously retrieved sites.
+"min_distance" basepair distant from previously retrieved sites.
 }
 \keyword{internal}
