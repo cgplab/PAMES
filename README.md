@@ -1,11 +1,16 @@
-# PAMES
-Purity Assessment through clonal MEthylation Sites
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+PAMES
+=====
+
+Purity Assessment by DNA MEthylation Sites
 
 Installation
--------------------------------------
+------------
 
-    # install.packages("devtools")
-    devtools::install_github("romagnolid/PAMES")
-    
+You can install PAMES from github with:
 
-
+``` r
+# install.packages("devtools")
+devtools::install_github("cgplab/PAMES")
+```

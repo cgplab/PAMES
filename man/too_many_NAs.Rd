@@ -16,6 +16,8 @@ logical
 }
 \description{
 If set to 1 returns FALSE only if all values are NAs. If set to 0, returns TRUE
-with a single NA
+with a single NA. That is, if the fraction of NAs is higher than threshold return
+TRUE (which is impossible if threshold is set to 1 and always true if set to 0 and
+one NA is present).
 }
 \keyword{internal}

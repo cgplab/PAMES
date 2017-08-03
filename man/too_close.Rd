@@ -4,12 +4,12 @@
 \alias{too_close}
 \title{Check whether a site is too close to the other sites or not.}
 \usage{
-too_close(new_idx, other_idxs, min_distance, platform_data)
+too_close(new_idx, prev_idxs, min_distance, platform_data)
 }
 \arguments{
 \item{new_idx}{an index (integer)}
 
-\item{other_idxs}{a vector of indexes (integer)}
+\item{prev_idxs}{a vector of indexes (integer)}
 
 \item{min_distance}{an integer. Distance in basepairs}
 }
