@@ -2,7 +2,7 @@
 % Please edit documentation in R/select_informative_sites.R
 \name{too_close}
 \alias{too_close}
-\title{Check whether a site is too close to the other sites or not.}
+\title{Check whether a site is too close to the other sites or not}
 \usage{
 too_close(new_idx, prev_idxs, min_distance, platform_data)
 }
