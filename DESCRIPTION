@@ -12,7 +12,8 @@ Depends: R (>= 3.3.1)
 biocViews: ROC
 Imports:
     assertthat,
-    ROC
+    ROC,
+    parallel
 Suggests:
     dplyr,
     knitr,
