@@ -17,7 +17,7 @@ too_close(new_idx, prev_idxs, min_distance, platform_data)
 logical
 }
 \description{
-Used in "cluster_recution" function only, given the index of a CpG site and
+Used in "cluster_redution" function only, given the index of a CpG site and
 a set of indexes of other sites, check if last added site is less than
 "min_distance" basepair distant from previously retrieved sites.
 }
