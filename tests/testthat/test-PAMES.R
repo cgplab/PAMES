@@ -1,24 +1,17 @@
 context("Test PAMES")
 
-test_that("'compute_AUC' stops correctly", {
-    expect_error(compute_AUC(tumor_toy_data, control_toy_data, n_threads = 1000),
-                 regexp = "selected more than available")
-})
-stop()
-
 test_that("'compute_AUC' works", {
-    auc <- compute_AUC(tumor_toy_data, control_toy_data, n_threads = 2)
+    auc <- compute_AUC(tumor_toy_data, control_toy_data)
     expect_is(auc, "numeric")
 })
 
 test_that("'remap_bs_data works", {
     n <- 1000
-    remapped <- remap_bs_data(bs_control_toy_data[, ],
+    remapped <- map_to_islands(bs_control_toy_data[, ],
                               bs_toy_sites[, ],
-                              islands_df=cpg_islands[seq_len(n), ],
-                              100)
+                              islands_df=cpg_islands[seq_len(n), ])
     expect_equal(nrow(remapped), n)
-    remapped <- remap_bs_data(bs_control_toy_data[, ],
+    remapped <- map_to_islands(bs_control_toy_data[, ],
                               bs_toy_sites[, ])
     expect_equal(nrow(remapped), nrow(cpg_islands))
 })

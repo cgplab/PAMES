@@ -10,13 +10,7 @@
 #' @param n_threads number of cores to use
 #' @return a vector of AUC scores
 #' @export
-compute_AUC <- function(tumor, control, max_NAs_frac=0.5, n_threads=1){
-    max_threads <- parallel::detectCores()
-    n_threads <- as.integer(n_threads)
-    stopifnot(is.integer(n_threads))
-    if (n_threads > max_threads) {
-        stop(sprintf("selected more than available (%i) threads", max_threads))
-    }
+compute_AUC <- function(tumor, control, max_NAs_frac=0.5){
     stopifnot(max_NAs_frac >= 0 | max_NAs_frac <= 1)
     stopifnot(nrow(tumor) == nrow(control))
 
@@ -28,14 +22,12 @@ compute_AUC <- function(tumor, control, max_NAs_frac=0.5, n_threads=1){
 
     full_table <- cbind(tumor[valid_row_idx, ], control[valid_row_idx, ])
     state <- c(rep(1, ncol(tumor)), rep(0, ncol(control)))
-    message(sprintf("[%s] Computing AUC with %s process(es)...",  Sys.time(), n_threads))
-    cl <- parallel::makeCluster(n_threads)
-    valid_auc <- parallel::parRapply(cl, full_table, function(x){
+    message(sprintf("[%s] Computing AUC ", Sys.time()))
+    valid_auc <- apply(full_table, 1, function(x){
         non_NA_idx <- which(!is.na(x))
         roc <- ROC::rocdemo.sca(truth=state[non_NA_idx], data=x[non_NA_idx], cutpts=seq(0, 1, .01))
         ROC::AUC(roc)
     })
-    parallel::stopCluster(cl)
     auc[valid_row_idx] <- valid_auc
     message(sprintf("[%s] Done.",  Sys.time()))
     return(auc)
