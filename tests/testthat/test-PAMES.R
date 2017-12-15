@@ -5,16 +5,16 @@ test_that("'compute_AUC' works", {
     expect_is(auc, "numeric")
 })
 
-test_that("'remap_bs_data works", {
-    n <- 1000
-    remapped <- map_to_islands(bs_control_toy_data[, ],
-                              bs_toy_sites[, ],
-                              islands_df=cpg_islands[seq_len(n), ])
-    expect_equal(nrow(remapped), n)
-    remapped <- map_to_islands(bs_control_toy_data[, ],
-                              bs_toy_sites[, ])
-    expect_equal(nrow(remapped), nrow(cpg_islands))
-})
+# test_that("'reduce_to_islands works", {
+#     n <- 1000
+#     remapped <- reduce_to_islands(bs_control_toy_data[, ],
+#                               bs_toy_sites[, ],
+#                               islands_df=cpg_islands[seq_len(n), ])
+#     expect_equal(nrow(remapped), n)
+#     remapped <- reduce_to_islands(bs_control_toy_data[, ],
+#                               bs_toy_sites[, ])
+#     expect_equal(nrow(remapped), nrow(cpg_islands))
+# })
 
 test_that("'selection_of_sites' returns a list with 2 vectors", {
     x <- as.matrix(runif(27578))

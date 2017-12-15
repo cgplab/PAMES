@@ -12,6 +12,9 @@ too_close(new_idx, prev_idxs, min_distance, platform_data)
 \item{prev_idxs}{a vector of indexes (integer)}
 
 \item{min_distance}{an integer. Distance in basepairs}
+
+\item{platform_data}{a data.frame with info about probes location
+(either \strong{450k} or \strong{27k}).}
 }
 \value{
 logical

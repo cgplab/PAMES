@@ -12,9 +12,6 @@
 cpg_islands
 }
 \description{
-Automatically loaded by \code{\link{map_to_islands}}.
-}
-\details{
 Downloaded on 2016-03-01.
 }
 \keyword{datasets}

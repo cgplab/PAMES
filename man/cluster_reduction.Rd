@@ -12,6 +12,9 @@ cluster_reduction(sites_idx, N, min_distance, platform_data)
 \item{N}{number of sites to retrieve}
 
 \item{min_distance}{an integer (in basepairs)}
+
+\item{platform_data}{a data.frame with info about probes location
+(either \strong{450k} or \strong{27k}).}
 }
 \value{
 a vector of indexes with close sites removed.

@@ -2,6 +2,6 @@
 
 export(compute_AUC)
 export(compute_purity)
-export(map_to_islands)
+export(reduce_to_islands)
 export(select_informative_islands)
 export(select_informative_sites)

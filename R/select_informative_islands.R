@@ -18,7 +18,8 @@
 #' info_sites <- select_informative_islands(mapped_bs_tumor_toy_data, auc)
 #' }
 #' @export
-select_informative_islands <- function(tumor, auc, max_sites = 20){
+select_informative_islands <- function(tumor, auc, hyper_range = c(min = .40, max = .90),
+  hypo_range = c(min = .10, max = .60), max_sites = 20){
     # check parameters ---------------------------------------------------------
     if (max_sites %% 2 != 0 & !is.integer(max_sites))
         stop("'max_sites' must be even")
@@ -30,8 +31,8 @@ select_informative_islands <- function(tumor, auc, max_sites = 20){
     # minimum and maximum beta per site ----------------------------------------
     beta_max <- suppressWarnings(apply(tumor, 1, max, na.rm=T))
     beta_min <- suppressWarnings(apply(tumor, 1, min, na.rm=T))
-    hyper_idx <- which(beta_min < .40 & beta_max > .90 & auc > .80)
-    hypo_idx  <- which(beta_min < .10 & beta_max > .60 & auc < .20)
+    hyper_idx <- which(beta_min < hyper_range[1] & beta_max > hyper_range[2] & auc > .80)
+    hypo_idx  <- which(beta_min < hypo_range[1]  & beta_max > hypo_range[2]  & auc < .20)
 
     message(sprintf("[%s] Total hyper-methylated sites = %i", Sys.time(), length(hyper_idx)))
     message(sprintf("[%s] Total hypo-methylated sites = %i",  Sys.time(), length(hypo_idx)))
