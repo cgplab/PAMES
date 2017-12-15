@@ -12,12 +12,15 @@ too_close(new_idx, prev_idxs, min_distance, platform_data)
 \item{prev_idxs}{a vector of indexes (integer)}
 
 \item{min_distance}{an integer. Distance in basepairs}
+
+\item{platform_data}{a data.frame with info about probes location
+(either \strong{450k} or \strong{27k}).}
 }
 \value{
 logical
 }
 \description{
-Used in "cluster_recution" function only, given the index of a CpG site and
+Used in "cluster_redution" function only, given the index of a CpG site and
 a set of indexes of other sites, check if last added site is less than
 "min_distance" basepair distant from previously retrieved sites.
 }

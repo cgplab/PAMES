@@ -9,6 +9,6 @@
 bs_control_toy_data
 }
 \description{
-Test with \code{\link{map_to_islands}}.
+Test with \code{\link{reduce_to_islands}}.
 }
 \keyword{datasets}

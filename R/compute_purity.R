@@ -16,9 +16,9 @@
 #' }
 compute_purity <- function(tumor, list_of_sites) {
     tumor <- as.matrix(tumor)
-    assertthat::assert_that(is.list(list_of_sites),
-                length(list_of_sites) == 2,
-                all(names(list_of_sites) %in% c("hyper", "hypo")) )
+    stopifnot(is.list(list_of_sites))
+    stopifnot(length(list_of_sites) == 2)
+    stopifnot(all(names(list_of_sites) %in% c("hyper", "hypo")))
 
     beta_values <- rbind(tumor[list_of_sites[["hyper"]],],
                          1 - tumor[list_of_sites[["hypo"]],])

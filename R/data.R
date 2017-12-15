@@ -24,8 +24,6 @@
 
 #' Curated set of CpG islands
 #'
-#' Automatically loaded by \code{\link{map_to_islands}}.
-#'
 #' Downloaded on 2016-03-01.
 #' @source \url{https://genome.ucsc.edu/}
 "cpg_islands"
@@ -33,17 +31,17 @@
 
 #' Toy data
 #'
-#' Test with \code{\link{map_to_islands}}.
+#' Test with \code{\link{reduce_to_islands}}.
 "bs_tumor_toy_data"
 
 #' Toy data
 #'
-#' Test with \code{\link{map_to_islands}}.
+#' Test with \code{\link{reduce_to_islands}}.
 "bs_control_toy_data"
 
 #' Toy data
 #'
-#' Test with \code{\link{map_to_islands}}.
+#' Test with \code{\link{reduce_to_islands}}.
 "bs_toy_sites"
 
 
