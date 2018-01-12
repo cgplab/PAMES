@@ -32,5 +32,4 @@ compute_AUC <- function(tumor, control, max_NAs_frac=1){
   auc[valid_row_idx] <- valid_auc
   message(sprintf("[%s] Done.",  Sys.time()))
   return(auc)
->>>>>>> develop
 }
