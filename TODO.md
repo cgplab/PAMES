@@ -1,0 +1,2 @@
+ -[ ] change compute purity to accept both hyper and hypo only
+ -[ ] make everything parallel

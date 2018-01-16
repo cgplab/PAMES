@@ -31,26 +31,30 @@
 
 #' Toy data
 #'
-#' Test with \code{\link{reduce_to_islands}}.
-"bs_tumor_toy_data"
-
-#' Toy data
-#'
-#' Test with \code{\link{reduce_to_islands}}.
-"bs_control_toy_data"
-
-#' Toy data
-#'
-#' Test with \code{\link{reduce_to_islands}}.
-"bs_toy_sites"
-
-
-#' Toy data
-#'
-#' Test with \code{\link{select_informative_sites}}.
+#' Example of tumor beta values from Illumina BeadChip
 "tumor_toy_data"
 
 #' Toy data
 #'
-#' Test with \code{\link{select_informative_sites}}.
+#' Example of control beta values from Illumina BeadChip
 "control_toy_data"
+
+#' Toy data
+#'
+#' Example of tumor beta values from Bisulphite Sequencing
+"bs_tumor_toy_data"
+
+#' Toy data
+#'
+#' Example of control beta values from Bisulphite Sequencing
+"bs_control_toy_data"
+
+#' Toy data
+#'
+#' Example of data.frame with location of CpG sites
+"bs_toy_sites"
+
+#' Toy data
+#'
+#' Example of data to map CpG sites to single CpG islands
+"bs_toy_indexes"

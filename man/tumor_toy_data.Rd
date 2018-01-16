@@ -9,6 +9,6 @@
 tumor_toy_data
 }
 \description{
-Test with \code{\link{select_informative_sites}}.
+Example of tumor beta values from Illumina BeadChip
 }
 \keyword{datasets}

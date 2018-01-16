@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-**PAMES** (*Purity Assessment by MEthylation Sites*) is a tool developed 
+**PAMES** (*Purity Assessment from MEthylation Sites*) is a tool developed 
 for estimating purity of tumor samples.
 The default process for data obtained with Illumina BeadChip 
 (450k or 27k) is characterized by two main steps:

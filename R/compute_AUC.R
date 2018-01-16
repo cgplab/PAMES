@@ -9,6 +9,9 @@
 #' major than or equal to it are excluded (default = 1; no NAs allowed).
 #' @return a vector of AUC scores
 #' @export
+#' @examples
+#' auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
+#' auc_data_bs <- compute_AUC(bs_tumor_toy_data, bs_control_toy_data)
 compute_AUC <- function(tumor, control, max_NAs_frac=1){
   tumor <- as.matrix(tumor)
   control <- as.matrix(control)
@@ -30,6 +33,6 @@ compute_AUC <- function(tumor, control, max_NAs_frac=1){
     ROC::AUC(roc)
   })
   auc[valid_row_idx] <- valid_auc
-  message(sprintf("[%s] Done.",  Sys.time()))
+  message(sprintf("[%s] Done",  Sys.time()))
   return(auc)
 }

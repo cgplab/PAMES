@@ -4,11 +4,11 @@
 \name{bs_control_toy_data}
 \alias{bs_control_toy_data}
 \title{Toy data}
-\format{An object of class \code{matrix} with 10000 rows and 7 columns.}
+\format{An object of class \code{matrix} with 4510 rows and 10 columns.}
 \usage{
 bs_control_toy_data
 }
 \description{
-Test with \code{\link{reduce_to_islands}}.
+Example of control beta values from Bisulphite Sequencing
 }
 \keyword{datasets}

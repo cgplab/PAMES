@@ -9,6 +9,6 @@
 control_toy_data
 }
 \description{
-Test with \code{\link{select_informative_sites}}.
+Example of control beta values from Illumina BeadChip
 }
 \keyword{datasets}

@@ -4,11 +4,11 @@
 \name{bs_toy_sites}
 \alias{bs_toy_sites}
 \title{Toy data}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 10000 rows and 2 columns.}
+\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 4510 rows and 2 columns.}
 \usage{
 bs_toy_sites
 }
 \description{
-Test with \code{\link{reduce_to_islands}}.
+Example of data.frame with location of CpG sites
 }
 \keyword{datasets}

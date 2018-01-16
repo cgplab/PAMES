@@ -9,19 +9,18 @@
 #' to be used to compute purity.
 #'
 #' @return a vector of purity estimates.
+#' @importFrom stats median
 #' @export
 #' @examples
-#' \dontrun{
-#' purity <- compute_purity(tumor, list_of_sites)
-#' }
+#' purity <- compute_purity(tumor_toy_data, list(hyper=c(1, 10, 20), hypo=c(15,30,45)))
 compute_purity <- function(tumor, list_of_sites) {
-    tumor <- as.matrix(tumor)
-    stopifnot(is.list(list_of_sites))
-    stopifnot(length(list_of_sites) == 2)
-    stopifnot(all(names(list_of_sites) %in% c("hyper", "hypo")))
+  tumor <- as.matrix(tumor)
+  stopifnot(is.list(list_of_sites))
+  stopifnot(length(list_of_sites) == 2)
+  stopifnot(all(names(list_of_sites) %in% c("hyper", "hypo")))
 
-    beta_values <- rbind(tumor[list_of_sites[["hyper"]],],
-                         1 - tumor[list_of_sites[["hypo"]],])
-    purity <- apply(beta_values, 2, median, na.rm=T)
-    return(purity)
+  beta_values <- rbind(tumor[list_of_sites[["hyper"]],],
+                       1 - tumor[list_of_sites[["hypo"]],])
+  purity <- apply(beta_values, 2, median, na.rm=T)
+  return(purity)
 }

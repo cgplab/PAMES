@@ -1,4 +1,4 @@
-#' PAMES: Purity Assessment through clonal MEthylation Sites
+#' PAMES: Purity Assessment from clonal MEthylation Sites
 #'
 #' The PAMES package provides a set of functions to estimate
 #' the level of purity of tumor samples.

@@ -21,3 +21,7 @@ a vector of AUC scores
 This function compute the Area Under Curve used to define the segregation
 between tumor and normal samples according to their beta-score.
 }
+\examples{
+auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
+auc_data_bs <- compute_AUC(bs_tumor_toy_data, bs_control_toy_data)
+}

@@ -21,7 +21,5 @@ Estimate the proportion of cancer cells in the admixture of cells
 constituting tumor microenvironment.
 }
 \examples{
-\dontrun{
-purity <- compute_purity(tumor, list_of_sites)
-}
+purity <- compute_purity(tumor_toy_data, list(hyper=c(1, 10, 20), hypo=c(15,30,45)))
 }

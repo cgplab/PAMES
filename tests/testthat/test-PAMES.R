@@ -13,7 +13,6 @@ test_that("'selection_of_sites' returns a list with 2 vectors", {
     expect_length(site_list, 2)
 })
 
-# illumina27k_hg19 %>% add_column(id=seq_len(27578)) %>% filter(Chromosome==1) %>% arrange(Genomic_Coordinate)
 test_that("'cluster_reduction' works", {
     res <- cluster_reduction(c(4722, 14309, 4522, 19915), 4, 1e6, illumina27k_hg19)
     expect_equal(res, c(4722))
@@ -28,5 +27,16 @@ test_that("'cluster_reduction' works", {
 test_that("'too_close' works", {
     expect_true(too_close(4722, 14309, 1e6, illumina27k_hg19))
     expect_false(too_close(1, 2:10, 1e6, illumina27k_hg19))
-    expect_false(too_close(1, c(), 1e6, illumina27k_hg19))
+})
+
+test_that("reduce_island works", {
+  res <- reduce_island(bs_tumor_toy_data[bs_toy_indexes[[1]], ], 3)
+  expect_length(res, 10)
+  expect_is(res, "numeric")
+})
+
+test_that("reduce_to_islands", {
+  reduced_tumor <- reduce_to_islands(bs_tumor_toy_data, bs_toy_indexes)
+  expect_is(reduced_tumor, "matrix")
+  expect_equal(nrow(reduced_tumor), length(bs_toy_indexes))
 })

@@ -4,10 +4,10 @@
 \alias{reduce_island}
 \title{Reduce a matrix subset}
 \usage{
-reduce_island(cpg_sites_matrix, n)
+reduce_island(matrix_subset, n)
 }
 \arguments{
-\item{cpg_sites_matrix}{a matrix}
+\item{matrix_subset}{a matrix}
 
 \item{n}{minimum required number of sites per island (return NA otherwise)}
 }

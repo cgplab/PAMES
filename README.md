@@ -3,7 +3,7 @@
 PAMES
 =====
 
-Purity Assessment by DNA MEthylation Sites
+Purity Assessment from DNA MEthylation Sites
 
 Installation
 ------------
