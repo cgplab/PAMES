@@ -4,7 +4,7 @@ Type: Package
 Title: Purity Assessment from clonal MEthylation Sites
 Description: Exploiting data from DNA methylation, this package provides the operations
     required to evaluate the purity of tumor samples. 
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(person("Dario", "Romagnoli", email="dario.romagnoli87@gmail.com",
                     role=c("aut", "cre")),
              person("Matteo", "Benelli", role="aut"))
