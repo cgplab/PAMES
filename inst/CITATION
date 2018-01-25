@@ -1,0 +1,16 @@
+citHeader("To cite PAMES in publications use:")
+
+citEntry(entry = "Article",
+  author = personList(as.person("Matteo Benelli"),
+    as.person("Dario Romagnoli"),
+    as.person("Francesca Demichelis")),
+  doi = "10.1093/bioinformatics/bty011",
+  journal = "Bioinformatics",
+  publisher = "Oxford University Press (OUP)",
+  title = "Tumor purity quantification by clonal DNA methylation signatures",
+  url = "https://doi.org/10.1093/bioinformatics/bty011",
+  year  = "2018",
+  textVersion = paste("Matteo Benelli, Dario Romagnoli, Francesca Demichelis;",
+    "Tumor purity quantification by clonal DNA methylation signatures,",
+    "Bioinformatics, bty011, https://doi.org/10.1093/bioinformatics/bty011")
+)
