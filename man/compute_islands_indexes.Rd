@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_islands_indexes.R
 \name{compute_islands_indexes}
 \alias{compute_islands_indexes}
-\title{Associate to CpG islands their corresponding CpG sites}
+\title{Associate CpG islands to corresponding CpG sites}
 \usage{
 compute_islands_indexes(cpg_sites, cpg_islands_df = cpg_islands)
 }
@@ -15,7 +15,7 @@ loads the `cpg_islands` data.frame that comes with the package (based on data
 downloaded from [UCSC Genome Browser](https://genome.ucsc.edu/) on date 2016-03-01.}
 }
 \description{
-Associate to CpG islands their corresponding CpG sites
+Associate CpG islands to corresponding CpG sites
 }
 \examples{
 cpg_indexes_short <- compute_islands_indexes(bs_toy_sites, head(cpg_islands,10))

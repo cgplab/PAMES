@@ -25,4 +25,6 @@ You can install PAMES from github with:
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("cgplab/PAMES")
+# with vignettes
+devtools::install_github("cgplab/PAMES", build_vignettes = T)
 ```

@@ -46,8 +46,8 @@ Both sets will be used to compute purity.
 }
 \examples{
 auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
-## WARNING: Being toy data the following code retrieves no informative sites
-## It's purpose is to show how to use the tool
+## WARNING: The following code doesn't retrieve any informative site
+## Its only purpose is to show how to use the tool
 info_sites <- select_informative_sites(tumor_toy_data, auc_data, platform="27k")
 info_sites.hg38 <- select_informative_sites(tumor_toy_data, auc_data,
                                             platform="27k", genome="hg38")

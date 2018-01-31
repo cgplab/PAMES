@@ -1,4 +1,4 @@
-#' Associate to CpG islands their corresponding CpG sites
+#' Associate CpG islands to corresponding CpG sites
 #'
 #' @param cpg_sites a data.frame reporting the location of CpG sites from Bisulphite
 #' Sequencing data and requiring two columns: chromosome and 1-based coordinate of CpG sites.
