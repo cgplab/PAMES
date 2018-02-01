@@ -54,31 +54,20 @@ with different data types.
     tumor_purity <- compute_purity(tumor_matrix, cpg_sites)
 
 ### Bisulphite Sequencing
-#### Data structure
-
-    bs_coordinates     bs_matrix
-    |chr  |  coord|    | tumor1| tumor2| control1| control2|
-    |:----|------:|    |------:|------:|--------:|--------:|
-    |chr1 | 135207|    |   0.98|   0.60|     0.80|     0.06|
-    |chr1 | 138290|    |   0.55|   0.24|     0.26|     0.56|
-    |.... | ......|    |   ....|   ....|     ....|     ....|
-    |chr2 | 661905|    |   0.60|   0.04|     0.10|     1.00|
-    |chr2 | 661925|    |   0.69|   0.64|     0.57|     0.80|
-
-### Pre-computed informative CpG islands (BRCA_islands)
+#### Pre-computed informative CpG islands (BRCA_islands)
  
     bs_BRCA_idx <- compute_islands_indexes(bs_BRCA_coordinates)
     bs_BRCA_reduced <- reduce_to_islands(bs_BRCA_tumor, bs_BRCA_idx)
     bs_BRCA_purity <- compute_purity(bs_BRCA_tumor, BRCA_islands)
     
-### New set of informative CpG islands
+#### New set of informative CpG islands
 
-    bs_idx <- compute_island_indexes(bs_coordinates)
-    bs_reduced <- reduce_to_islands(bs_matrix, bs_idx)
-    bs_tumor_matrix <- bs_reduced[, 1:2]                                         # <<< ADDITIONAL STEP
-    bs_control_matrix <- bs_reduced[, 3:4]                                       # <<< ADDITIONAL STEP
-    bs_islands <- select_informative_islands(bs_tumor_matrix, bs_control_matrix) # <<< ADDITIONAL STEP
-    bs_purity <- compute_purity(bs_tumor_matrix, bs_islands)
+    bs_toy_idx <- compute_islands_indexes(bs_toy_coordinates)
+    bs_toy_reduced <- reduce_to_islands(bs_toy_matrix, bs_toy_idx)
+    bs_tumor_toy_matrix <- bs_toy_reduced[, 1:2]
+    bs_control_toy_matrix <- bs_toy_reduced[, 3:4]
+    bs_toy_islands <- select_informative_islands(bs_tumor_toy_matrix, bs_control_toy_matrix)
+    bs_toy_purity <- compute_purity(bs_tumor_toy_matrix, bs_toy_islands)
     
 **NOTE**
 
