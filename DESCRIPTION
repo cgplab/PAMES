@@ -1,5 +1,5 @@
 Package: PAMES
-Date: 2018-01-31
+Date: 2018-02-01
 Type: Package
 Title: Purity Assessment from clonal MEthylation Sites
 Description: Exploiting data from DNA methylation, this package provides the operations

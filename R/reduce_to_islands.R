@@ -22,8 +22,8 @@ reduce_to_islands <- function(cpg_sites_matrix, cpg_indexes, min_CpGs = 3){
   cpg_sites_matrix <- as.matrix(cpg_sites_matrix)
   message(sprintf("[%s] Reducing beta values...",  Sys.time()))
   cpg_islands_matrix <- do.call("rbind",
-                                lapply(cpg_indexes, function(idx){
-                                  reduce_island(cpg_sites_matrix[idx, , drop = F], min_CpGs)})
+    lapply(cpg_indexes, function(idx){
+      reduce_island(cpg_sites_matrix[idx, , drop = F], min_CpGs)})
   )
   if (is.null(names(cpg_indexes))) {
     names(cpg_indexes) <- paste0("cpg", seq(1, length(cpg_indexes)))
