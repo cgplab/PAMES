@@ -3,7 +3,7 @@
 \docType{data}
 \name{bs_toy_indexes}
 \alias{bs_toy_indexes}
-\title{Toy data}
+\title{BS Toy indexes}
 \format{An object of class \code{list} of length 1000.}
 \usage{
 bs_toy_indexes

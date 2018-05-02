@@ -22,39 +22,40 @@
 #' @source \url{https://support.illumina.com/array/array_kits/infinium_humanmethylation27_beadchip_kit.html.html}
 "illumina450k_hg38"
 
-#' Curated set of CpG islands
-#'
-#' Downloaded on 2016-03-01.
-#' @source \url{https://genome.ucsc.edu/}
-"cpg_islands"
-
-
-#' Toy data
+#' Illumina Tumor Toy data
 #'
 #' Example of tumor beta values from Illumina BeadChip
 "tumor_toy_data"
 
-#' Toy data
+#' Illumina Control Toy data
 #'
 #' Example of control beta values from Illumina BeadChip
 "control_toy_data"
 
-#' Toy data
+#' Curated set of CpG islands
 #'
-#' Example of tumor beta values from Bisulphite Sequencing
-"bs_tumor_toy_data"
+#' Downloaded on 2016-03-01.
+#' @source \url{https://genome.ucsc.edu/}
+"cpg_islands_df"
 
-#' Toy data
+#' Deprecated data
 #'
-#' Example of control beta values from Bisulphite Sequencing
-"bs_control_toy_data"
+#' Dataset has been renamed, use \code{cpg_islands_df} instead.
+#' Please change your code to use the new name, as
+#' the deprecated dataset will become defunct in future versions.
+"cpg_islands"
 
-#' Toy data
+#' BS Toy data
+#'
+#' Example of tumor and control beta values from Bisulphite Sequencing
+"bs_toy_matrix"
+
+#' BS Toy sites
 #'
 #' Example of data.frame with location of CpG sites
 "bs_toy_sites"
 
-#' Toy data
+#' BS Toy indexes
 #'
 #' Example of data to map CpG sites to single CpG islands
 "bs_toy_indexes"

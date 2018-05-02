@@ -4,21 +4,21 @@
 \alias{compute_islands_indexes}
 \title{Associate CpG islands to corresponding CpG sites}
 \usage{
-compute_islands_indexes(cpg_sites, cpg_islands_df = cpg_islands)
+compute_islands_indexes(cpg_sites, cpg_islands = cpg_islands_df)
 }
 \arguments{
-\item{cpg_sites}{a data.frame reporting the location of CpG sites from Bisulphite
-Sequencing data and requiring two columns: chromosome and 1-based coordinate of CpG sites.}
+\item{cpg_sites}{A data.frame reporting the location of CpG sites from Bisulphite
+Sequencing data. It requires two columns: chromosome and 1-based coordinate of CpG sites.}
 
-\item{cpg_islands_df}{a data.frame reporting the location of the CpG islands. By default it
-loads the `cpg_islands` data.frame that comes with the package (based on data
+\item{cpg_islands}{A data.frame reporting the location of the CpG islands. By default it
+loads the `cpg_islands_df` data.frame that comes with the package (based on data
 downloaded from [UCSC Genome Browser](https://genome.ucsc.edu/) on date 2016-03-01.}
 }
 \description{
 Associate CpG islands to corresponding CpG sites
 }
 \examples{
-cpg_indexes_short <- compute_islands_indexes(bs_toy_sites, head(cpg_islands,10))
+cpg_indexes_short <- compute_islands_indexes(bs_toy_sites, head(cpg_islands_df, 10))
 \dontrun{
 cpg_indexes <- compute_islands_indexes(bs_toy_sites)
 }
