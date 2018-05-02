@@ -17,6 +17,7 @@
 #' required to select hypo-methylated informative sites.
 #' @return A named list of indexes of informative islands ("hyper-" and
 #' "hypo-methylated").
+#' @importFrom stats na.omit
 #' @export
 #' @examples
 #' reduced_data <- reduce_to_islands(round(bs_toy_matrix*100), bs_toy_indexes)
