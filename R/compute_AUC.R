@@ -7,15 +7,15 @@
 #' @param tumor_table A matrix of beta-values (percentage) from tumor samples.
 #' @param control_table A matrix of beta-values (percentage) from
 #' normal/control samples.
+#' @param ncores Number of parallel processes to use for parallel computing
 #' @param na_threshold Fraction of NAs (considered independently in tumor and
 #' control samples) above which a site will not be selected (default=0).
-#' @param ncores Number of parallel processes to use for parallel computing
 #' @return A vector of AUC scores.
 #' @export
 #' @examples
 #' auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
 #' auc_data_bs <- compute_AUC(bs_toy_matrix[,1:10], bs_toy_matrix[,11:20])
-compute_AUC <- function(tumor_table, control_table, na_threshold=1, ncores=1,
+compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold=0,
   max_NAs_frac, tumor, control){
   # check parameters
   if (!missing(max_NAs_frac)){
@@ -28,28 +28,28 @@ compute_AUC <- function(tumor_table, control_table, na_threshold=1, ncores=1,
       tumor_table <- tumor
       control_table <- control
   }
-
   ncores <- as.integer(ncores)
   system_cores <- parallel::detectCores()
   assertthat::assert_that(ncores < system_cores)
 
   na_threshold <- as.numeric(na_threshold)
-  assertthat::assert_that(na_threshold >= 0 || na_threshold <= 1)
+  assertthat::assert_that(na_threshold >= 0 || na_threshold < 1)
 
-  diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-  diff_range_c <- diff(range(control_table, na.rm = TRUE))
-  assertthat::assert_that(diff_range_t > 1 && diff_range_t <= 100 &&
-    diff_range_c > 1 && diff_range_c <= 100,
-    msg=paste("For computation efficiency, convert tumor and control tables",
-        "to percentage values."))
-  beta_table <- round(as.matrix(cbind(tumor_table, control_table)))
-  storage.mode(beta_table) <- "integer"
+  beta_table <- as.matrix(cbind(tumor_table, control_table))
+  diff_range <- diff(range(beta_table, na.rm = TRUE))
+  if (diff_range <= 1 || diff_range > 100) {
+    stop(paste0("For computation efficiency please convert tumor and control",
+        "tables to percentage value."))
+  } else {
+    beta_table <- round(beta_table)
+    storage.mode(beta_table) <- "integer"
+  }
   sample_state <- c(rep(TRUE, ncol(tumor_table)), rep(FALSE, ncol(control_table)))
 
   message(sprintf("[%s] Computing AUC ", Sys.time()))
   cl <- parallel::makeCluster(ncores)
   auc <- parallel::parApply(cl, beta_table, 1, single_AUC,
-    state = sample_state, na_threshold = na_threshold)
+    states = sample_state, na_threshold = na_threshold)
   parallel::stopCluster(cl)
   message(sprintf("[%s] Done",  Sys.time()))
   return(auc)
@@ -57,22 +57,27 @@ compute_AUC <- function(tumor_table, control_table, na_threshold=1, ncores=1,
 
 #' Compute AUC a single vector
 #'
+#' Use Wilcoxon method to compute AUC.
 #' Return NA if NA samples are more than threshold
 #'
-#' @param x integer vector (range 0-1)
-#' @param state logical vector
-#' @param na_threshold numeric
+#' @param scores integer vector (range 1-100)
+#' @param states logical vector (class labels)
+#' @param na_threshold fraction of scores (range 0-1)
 #' @keywords internal
-single_AUC <- function(x, state, na_threshold) {
-  stopifnot(is.numeric(x))
-  all_NA <- all(is.na(x))
-  tumor_NA <- sum(is.na(x[state])) / length(x[state]) > na_threshold
-  control_NA <- sum(is.na(x[!state])) / length(x[!state]) > na_threshold
-  if (all_NA || tumor_NA || control_NA ) {
+single_AUC <- function(scores, states, na_threshold) {
+  assertthat::assert_that(is.integer(scores))
+  assertthat::assert_that(is.logical(states))
+  if (all(is.na(scores))) {
     return(NA)
-  } else {
-    roc <- ROC::rocdemo.sca(state[!is.na(x)], x[!is.na(x)],
-      cutpts = seq(0, 100, 1))
-    return(ROC::AUC(roc))
   }
+  tumor_NA <- sum(is.na(scores[states]))/sum(states) > na_threshold
+  control_NA <- sum(is.na(scores[!states]))/sum(!states) > na_threshold
+  if (tumor_NA || control_NA) {
+    return(NA)
+  }
+  n1 <- sum(states[!is.na(scores)])
+  n2 <- sum(!states[!is.na(scores)])
+  R1 <- sum(rank(scores)[states])
+  U1 <- R1 - n1*(n1+1)/2
+  return(U1/(n1*n2))
 }

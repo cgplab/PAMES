@@ -4,16 +4,17 @@
 \alias{single_AUC}
 \title{Compute AUC a single vector}
 \usage{
-single_AUC(x, state, na_threshold)
+single_AUC(scores, states, na_threshold)
 }
 \arguments{
-\item{x}{integer vector (range 0-1)}
+\item{scores}{integer vector (range 1-100)}
 
-\item{state}{logical vector}
+\item{states}{logical vector (class labels)}
 
-\item{na_threshold}{numeric}
+\item{na_threshold}{fraction of scores (range 0-1)}
 }
 \description{
+Use Wilcoxon method to compute AUC.
 Return NA if NA samples are more than threshold
 }
 \keyword{internal}

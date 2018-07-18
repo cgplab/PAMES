@@ -1,3 +1,8 @@
+# PAMES v1.0.1
+
+* Faster compute_AUC thanks to Wilcoxon method
+
+
 # PAMES v1.0.0
 
 ## New Features
