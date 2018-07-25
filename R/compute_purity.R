@@ -16,7 +16,7 @@ compute_purity <- function(tumor_table, list_of_sites, tumor) {
   assertthat::assert_that(is.list(list_of_sites))
   assertthat::assert_that(length(list_of_sites) == 2)
   assertthat::assert_that(all(names(list_of_sites) %in% c("hyper", "hypo")))
-  if (!missing(tumor) || !missing(control)){
+  if (!missing(tumor)){
     warning("'tumor' is deprecated. Use 'tumor_table' instead.")
     tumor_table <- tumor
   }
