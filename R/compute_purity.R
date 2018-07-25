@@ -17,9 +17,8 @@ compute_purity <- function(tumor_table, list_of_sites, tumor) {
   assertthat::assert_that(length(list_of_sites) == 2)
   assertthat::assert_that(all(names(list_of_sites) %in% c("hyper", "hypo")))
   if (!missing(tumor) || !missing(control)){
-    warning(paste0("'tumor' is deprecated.
-      Use 'tumor_table' instead."))
-      tumor_table <- tumor
+    warning("'tumor' is deprecated. Use 'tumor_table' instead.")
+    tumor_table <- tumor
   }
   beta_values <- rbind(tumor_table[list_of_sites[["hyper"]],],
                        1 - tumor_table[list_of_sites[["hypo"]],])

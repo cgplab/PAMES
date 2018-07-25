@@ -4,17 +4,16 @@
 \alias{single_AUC}
 \title{Compute AUC a single vector}
 \usage{
-single_AUC(scores, states, na_threshold)
+single_AUC(scores, states)
 }
 \arguments{
 \item{scores}{integer vector (range 1-100)}
 
 \item{states}{logical vector (class labels)}
-
-\item{na_threshold}{fraction of scores (range 0-1)}
 }
 \description{
 Use Wilcoxon method to compute AUC.
 Return NA if NA samples are more than threshold
 }
+\keyword{\href{http://blog.revolutionanalytics.com/2017/03/auc-meets-u-stat.html}{http://blog.revolutionanalytics.com}}
 \keyword{internal}
