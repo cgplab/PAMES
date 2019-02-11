@@ -7,33 +7,19 @@
 #' @param tumor_table A matrix of beta-values (percentage) from tumor samples.
 #' @param control_table A matrix of beta-values (percentage) from
 #' normal/control samples.
-#' @param ncores Number of parallel processes to use for parallel computing
+#' @param ncores Number of parallel processes to use for parallel computing.
 #' @param na_threshold Fraction of NAs (considered independently in tumor and
 #' control samples) above which a site will not be selected (default=0).
 #' @return A vector of AUC scores.
 #' @export
-#' @examples
-#' auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
-#' auc_data_bs <- compute_AUC(bs_toy_matrix[,1:10], bs_toy_matrix[,11:20])
-compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold=0,
-  max_NAs_frac, tumor, control){
+compute_AUC <- function(tumor_table, control_table, ncores = 1, na_threshold = 0) {
   # check parameters
-  if (!missing(max_NAs_frac)){
-    warning("'max_NAs_frac' is deprecated. Use 'na_threshold' instead.")
-    na_threshold <- max_NAs_frac
-  }
-  if (!missing(tumor) || !missing(control)){
-    warning(paste0("'tumor' and 'control' are deprecated.
-      Use 'tumor_table' and 'control_table' instead."))
-      tumor_table <- tumor
-      control_table <- control
-  }
   ncores <- as.integer(ncores)
   system_cores <- parallel::detectCores()
   assertthat::assert_that(ncores < system_cores)
 
   na_threshold <- as.numeric(na_threshold)
-  assertthat::assert_that(na_threshold >= 0 || na_threshold < 1)
+  assertthat::assert_that(na_threshold >= 0, na_threshold < 1)
 
   beta_table <- as.matrix(cbind(tumor_table, control_table))
   diff_range <- diff(range(beta_table, na.rm = TRUE))
@@ -48,20 +34,15 @@ compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold=0,
 
   # select rows by NAs
   message(sprintf("[%s] Filter NA rows", Sys.time()))
-  tumor_NAs <- apply(beta_table[,sample_state], 1, function(x) {
-    sum(is.na(x))
-  })/sum(sample_state) <= na_threshold
-  control_NAs <- apply(beta_table[,!sample_state], 1, function(x) {
-    sum(is.na(x))
-  })/sum(!sample_state) <= na_threshold
+  tumor_below_na_threshold <- apply(beta_table[,sample_state], 1, function(x) { sum(is.na(x)) })/sum(sample_state) <= na_threshold
+  control_below_na_threshold <- apply(beta_table[,!sample_state], 1, function(x) { sum(is.na(x)) })/sum(!sample_state) <= na_threshold
 
-  NAs_idx <- which(tumor_NAs & control_NAs)
+  below_threshold_idx <- which(tumor_below_na_threshold & control_below_na_threshold)
 
   auc <- rep(NA_real_, nrow(beta_table))
   message(sprintf("[%s] Compute AUC", Sys.time()))
   cl <- parallel::makeCluster(ncores)
-  auc[NAs_idx] <- parallel::parApply(cl, beta_table[NAs_idx,], 1,
-                                     single_AUC, states = sample_state)
+  auc[below_threshold_idx] <- parallel::parApply(cl, beta_table[below_threshold_idx,], 1, single_AUC, states = sample_state)
   parallel::stopCluster(cl)
   message(sprintf("[%s] Done",  Sys.time()))
   return(auc)
@@ -70,7 +51,6 @@ compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold=0,
 #' Compute AUC a single vector
 #'
 #' Use Wilcoxon method to compute AUC.
-#' Return NA if NA samples are more than threshold
 #'
 #' @param scores integer vector (range 1-100)
 #' @param states logical vector (class labels)

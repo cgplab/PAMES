@@ -1,3 +1,8 @@
+# PAMES v1.1.0
+
+* BUG correction: setting na_threshold to be greater than 1 didn't generate an error
+(and resulted as having na_threshold set to 0.99)
+
 # PAMES v1.0.1
 
 * Faster compute_AUC thanks to Wilcoxon method
