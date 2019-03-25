@@ -34,10 +34,10 @@ compute_AUC <- function(tumor_table, control_table, ncores = 1, na_threshold = 0
 
   # select rows by NAs
   message(sprintf("[%s] Filter NA rows", Sys.time()))
-  tumor_below_na_threshold <- apply(beta_table[,sample_state], 1, function(x) { sum(is.na(x)) })/sum(sample_state) <= na_threshold
-  control_below_na_threshold <- apply(beta_table[,!sample_state], 1, function(x) { sum(is.na(x)) })/sum(!sample_state) <= na_threshold
+  tumor_valid_sites <- rowSums(is.na(beta_table[,sample_state]))/sum(sample_state) <= na_threshold
+  control_valid_sites <- rowSums(is.na(beta_table[,!sample_state]))/sum(!sample_state) <= na_threshold
 
-  below_threshold_idx <- which(tumor_below_na_threshold & control_below_na_threshold)
+  below_threshold_idx <- which(tumor_valid_sites & control_valid_sites)
 
   auc <- rep(NA_real_, nrow(beta_table))
   message(sprintf("[%s] Compute AUC", Sys.time()))
