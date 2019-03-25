@@ -47,16 +47,16 @@ select_informative_islands <- function(tumor_table, auc, max_sites = 20,
   message(sprintf("Hypo-methylated sites range: %s",  paste(hypo_range, collapse = " - ")))
 
   # minimum and maximum beta per site ----------------------------------------
-  beta_max <- suppressWarnings(apply(tumor_table, 1, max, na.rm=T))
-  beta_min <- suppressWarnings(apply(tumor_table, 1, min, na.rm=T))
+  beta_max <- suppressWarnings(apply(tumor_table, 1, max, na.rm=TRUE))
+  beta_min <- suppressWarnings(apply(tumor_table, 1, min, na.rm=TRUE))
   hyper_idx <- which(beta_min < hyper_range[1] & beta_max > hyper_range[2] & auc > .80)
   hypo_idx  <- which(beta_min < hypo_range[1]  & beta_max > hypo_range[2]  & auc < .20)
 
   message(sprintf("[%s] Total hyper-methylated sites = %i", Sys.time(), length(hyper_idx)))
   message(sprintf("[%s] Total hypo-methylated sites = %i",  Sys.time(), length(hypo_idx)))
 
-  ordered_hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing=T)]
-  ordered_hypo_idx  <- hypo_idx[order(auc[hypo_idx], decreasing=F)]
+  ordered_hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing=TRUE)]
+  ordered_hypo_idx  <- hypo_idx[order(auc[hypo_idx], decreasing=FALSE)]
 
   top_hyper_idx <- ordered_hyper_idx[seq(max_sites/2)]
   message(sprintf("[%s] Hyper-sites selection: %i", Sys.time(),
