@@ -13,7 +13,6 @@ single_AUC(scores, states)
 }
 \description{
 Use Wilcoxon method to compute AUC.
-Return NA if NA samples are more than threshold
 }
 \keyword{\href{http://blog.revolutionanalytics.com/2017/03/auc-meets-u-stat.html}{http://blog.revolutionanalytics.com}}
 \keyword{internal}

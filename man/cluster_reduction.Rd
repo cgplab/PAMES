@@ -20,7 +20,8 @@ cluster_reduction(sites_idx, N, min_distance, platform_data)
 a vector of indexes with close sites removed.
 }
 \description{
-Remove sites within 'min_distance' (keep only one, per 'cluster'), keeping
+Takes a vector of indexes (ordered by AUC) and
+removes sites within 'min_distance' (keep only one, per 'cluster'), keeping
 at most N sites accoring to their order.
 }
 \keyword{internal}

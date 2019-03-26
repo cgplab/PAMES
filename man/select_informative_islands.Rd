@@ -5,8 +5,8 @@
 \title{Select informative CpG islands}
 \usage{
 select_informative_islands(tumor_table, auc, max_sites = 20,
-  hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
-  tumor)
+  hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max =
+  60), tumor)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}
