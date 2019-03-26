@@ -46,13 +46,11 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20,
   }
   tumor_table <- as.matrix(tumor_table)
   diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-  assertthat::assert_that(diff_range_t > 1 && diff_range_t <= 100,
-    msg=paste("For computation efficiency, convert tumor table",
+  assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100,
+    msg=paste("For computation efficiency convert tumor table",
         "to percentage values."))
   tumor_table <- round(tumor_table)
   storage.mode(tumor_table) <- "integer"
-
-  auc <- as.numeric(auc)
 
   assertthat::assert_that(nrow(tumor_table) == length(auc))
   assertthat::assert_that(nrow(tumor_table) == nrow(platform_data),
@@ -79,16 +77,16 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20,
   message(sprintf("Hypo-methylated sites range: %s",  paste(hypo_range, collapse = " - ")))
 
   # minimum and maximum beta per site ----------------------------------------
-  beta_max <- suppressWarnings(apply(tumor_table, 1, max, na.rm = T))
-  beta_min <- suppressWarnings(apply(tumor_table, 1, min, na.rm = T))
+  beta_max <- suppressWarnings(apply(tumor_table, 1, max, na.rm = TRUE))
+  beta_min <- suppressWarnings(apply(tumor_table, 1, min, na.rm = TRUE))
   hyper_idx <- which(beta_min < hyper_range[1] & beta_max > hyper_range[2] & auc > .80)
   hypo_idx  <- which(beta_min < hypo_range[1]  & beta_max > hypo_range[2]  & auc < .20)
 
   message(sprintf("[%s] Total hyper-methylated sites = %i", Sys.time(), length(hyper_idx)))
   message(sprintf("[%s] Total hypo-methylated sites = %i",  Sys.time(), length(hypo_idx)))
 
-  ordered_hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing = T)]
-  ordered_hypo_idx  <- hypo_idx[order(auc[hypo_idx],   decreasing = F)]
+  ordered_hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing = TRUE)]
+  ordered_hypo_idx  <- hypo_idx[order(auc[hypo_idx],   decreasing = FALSE)]
 
   message(sprintf("[%s] Hyper-methylated sites cluster reduction...", Sys.time()))
   top_hyper_idx <- cluster_reduction(ordered_hyper_idx, max_sites/2, min_distance, platform_data)
@@ -100,7 +98,8 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20,
 
 #' Remove CpG sites too close to each other
 #'
-#' Remove sites within 'min_distance' (keep only one, per 'cluster'), keeping
+#' Takes a vector of indexes (ordered by AUC) and
+#' removes sites within 'min_distance' (keep only one, per 'cluster'), keeping
 #' at most N sites accoring to their order.
 #' @param sites_idx a vector of integers
 #' @param N number of sites to retrieve
@@ -141,7 +140,7 @@ cluster_reduction <- function(sites_idx, N, min_distance, platform_data){
 #' @return logical
 too_close <- function(new_idx, prev_idxs, min_distance, platform_data){
   if (length(prev_idxs) == 0) {
-    answer <- FALSE
+    return(FALSE)
   } else {
     new_site <- platform_data[new_idx,]
     other_sites <- platform_data[prev_idxs,]
@@ -156,6 +155,6 @@ too_close <- function(new_idx, prev_idxs, min_distance, platform_data){
     # pairwise comparision of chromosome location and distance
     answer <- any(same_chromosome & within_min_distance)
   }
-  return(ifelse(test = is.na(answer), yes = F, no = answer))
+  return(ifelse(test = is.na(answer), yes = FALSE, no = answer))
 }
 
