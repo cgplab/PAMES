@@ -36,13 +36,6 @@
 #'
 #' Downloaded on 2016-03-01.
 #' @source \url{https://genome.ucsc.edu/}
-"cpg_islands_df"
-
-#' Deprecated data
-#'
-#' Dataset has been renamed, use \code{cpg_islands_df} instead.
-#' Please change your code to use the new name, as
-#' the deprecated dataset will become defunct in future versions.
 "cpg_islands"
 
 #' BS Toy data
@@ -54,8 +47,3 @@
 #'
 #' Example of data.frame with location of CpG sites
 "bs_toy_sites"
-
-#' BS Toy indexes
-#'
-#' Example of data to map CpG sites to single CpG islands
-"bs_toy_indexes"

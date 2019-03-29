@@ -17,9 +17,8 @@ library(devtools)
 # use_data(illumina27k_hg38, overwrite=T)
 # use_data(illumina450k_hg38, overwrite=T)
 
-source("../R/compute_islands_indexes.R")
 load("../data/cpg_islands_df.rda")
-N <- 1000 # firt N islands
+N <- 1000 # first N islands
 bs_tumor_toy_matrix <- c()
 bs_control_toy_matrix <- c()
 cpg_sites <- c()
@@ -47,10 +46,9 @@ for (i in seq_len(N)){
   bs_control_toy_matrix <- rbind(bs_control_toy_matrix, controls)
   cpg_sites <- c(cpg_sites, pos)
 }
-bs_toy_sites <- data_frame(chr = "chr1", pos = cpg_sites)
+
+bs_toy_sites <- tibble(chr = "chr1", pos = cpg_sites)
 dimnames(bs_tumor_toy_matrix) <- list(paste0("chr1_", cpg_sites), paste0("tumor", seq_len(nsamples)))
 dimnames(bs_control_toy_matrix) <- list(paste0("chr1_", cpg_sites), paste0("control", seq_len(nsamples)))
-bs_toy_matrix <- cbind(bs_tumor_toy_matrix, bs_control_toy_matrix)
-bs_toy_indexes <- compute_islands_indexes(bs_toy_sites, head(cpg_islands_df, N))
-names(bs_toy_indexes) <- cpg_islands_names
-use_data(bs_toy_matrix, bs_toy_sites, bs_toy_indexes, overwrite = TRUE)
+bs_toy_matrix <- round(cbind(bs_tumor_toy_matrix, bs_control_toy_matrix)*100)
+use_data(bs_toy_matrix, bs_toy_sites, overwrite = TRUE)

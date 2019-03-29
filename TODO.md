@@ -1,4 +1,0 @@
-- [ ] change compute purity to accept both hyper and hypo only
-- [ ] add reduction of sites to islands for informative islands only (way faster)
-- [ ] remove deprecated objects
-- [ ] make everything parallel

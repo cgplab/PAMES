@@ -4,12 +4,12 @@
 \alias{single_AUC}
 \title{Compute AUC a single vector}
 \usage{
-single_AUC(scores, states)
+single_AUC(scores, is_tumor)
 }
 \arguments{
 \item{scores}{integer vector (range 1-100)}
 
-\item{states}{logical vector (class labels)}
+\item{is_tumor}{logical vector (class labels)}
 }
 \description{
 Use Wilcoxon method to compute AUC.

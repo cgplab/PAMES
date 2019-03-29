@@ -1,30 +1,21 @@
-context("AUC")
+context("AUC")  ##################################################
 test_that("'compute_AUC' errors and warnings", {
-  skip("AUC")
-  expect_error(compute_AUC(tumor_toy_data[1:10,]/100, control_toy_data[1:10,]),
-    "computation efficiency")
-  expect_error(compute_AUC(tumor_toy_data[1:10,], control_toy_data[1:10,]/100),
-    "computation efficiency")
-  expect_warning(compute_AUC(tumor=tumor_toy_data[1:10,],
-      control=control_toy_data[1:10,]), "deprecated")
+  expect_error(compute_AUC(tumor_toy_data[1:10,]/100, control_toy_data[1:10,]), "tumor table")
+  expect_error(compute_AUC(tumor_toy_data[1:10,]/100, control_toy_data[1:10,]), "tumor table")
+  expect_error(compute_AUC(tumor_toy_data[1:10,], control_toy_data[1:10,]/100), "control table")
 })
 test_that("'compute_AUC' works", {
-  skip("AUC")
-  auc <- compute_AUC(tumor_toy_data, control_toy_data, ncores=4)
-  expect_is(auc, "numeric")
+  auc <- compute_AUC(tumor_toy_data, control_toy_data)
+  expect_type(auc, "double")
 })
 
-context("selection of sites")
+context("selection of sites") ##################################################
 test_that("'selection_of_sites' errors and warnings", {
-  skip("sel of sites")
-  expect_warning(select_informative_sites(tumor=tumor_toy_data,
-    auc=runif(nrow(tumor_toy_data)), platform="27"), "deprecated")
   expect_error(select_informative_sites(tumor_toy_data,
     runif(nrow(tumor_toy_data)), platform="27", max_sites=19), "even")
 })
 test_that("'selection_of_sites' works", {
-  skip("sel of sites")
-  auc <- round(runif(27578))
+  auc <- runif(27578)
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27")
   expect_type(site_list, "list")
   expect_length(site_list, 2)
@@ -40,27 +31,20 @@ test_that("'cluster_reduction' works", {
  expect_equal(res, c(4722, 14309))
 })
 test_that("'too_close' works", {
-  expect_true(too_close(4722, 14309, 1e6, illumina27k_hg19))
-  expect_false(too_close(1, 2:10, 1e6, illumina27k_hg19))
+  expect_true(is_too_close(4722, 14309, 1e6, illumina27k_hg19))
+  expect_false(is_too_close(1, 2:10, 1e6, illumina27k_hg19))
 })
 
-context("Bisulphite sequencing")
-test_that("reduce_to_island works", {
-  idx <- unlist(bs_toy_indexes[1:10])
-  reduced_tumor <-
-    reduce_to_islands(bs_toy_matrix[idx, 1:10], bs_toy_indexes[1:10], 3)
-  expect_equal(nrow(reduced_tumor), 10)
+context("CpG regions") ##################################################
+test_that("median of regions", {
+  x <- rbind(rep(NA, 10), sample(100, 10), sample(100, 10))
+  x[,3] <- NA
+  expect_type(median_of_region(x, 2), "double")
+  expect_true(is.na(median_of_region(x, 3)))
+})
+test_that("reduce_to_regions works", {
+  expect_error(reduce_to_regions(tumor_toy_data, illumina27k_hg19, cpg_islands), "No shared chromosomes")
+
+  reduced_tumor <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands)
   expect_is(reduced_tumor, "matrix")
-})
-test_that("compute_islands_indexes works", {
-  cpg_indexes <- compute_islands_indexes(bs_toy_sites, head(cpg_islands_df, 10))
-  expect_is(cpg_indexes, "list")
-  expect_equal(length(cpg_indexes), 10)
-})
-
-context("Compute purity")
-test_that("purity sites", {
-  compute_gg
-})
-test_that("purity islands", {
 })

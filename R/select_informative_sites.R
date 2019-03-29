@@ -24,39 +24,32 @@
 #' @return A named list of indexes of informative sites ("hyper-" and "hypo-methylated").
 #' @export
 #' @examples
-#' auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
 #' ## WARNING: The following code doesn't retrieve any informative site
 #' ## Its only purpose is to show how to use the tool
+#' auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
 #' info_sites <- select_informative_sites(tumor_toy_data, auc_data, platform="27k")
-#' info_sites.hg38 <- select_informative_sites(tumor_toy_data, auc_data,
-#'  platform="27k", genome="hg38")
-select_informative_sites <- function(tumor_table, auc, max_sites = 20,
-  min_distance = 1e6, hyper_range = c(min = 40, max = 90),
-  hypo_range = c(min = 10, max = 60),
-  genome = c("hg19", "hg38"), platform = c("450k", "27k"),
-  tumor){
-  # check parameters ---------------------------------------------------------
+#' info_sites.hg38 <- select_informative_sites(tumor_toy_data, auc_data, platform="27k", genome="hg38")
+select_informative_sites <- function(tumor_table, auc, max_sites = 20, min_distance = 1e6,
+  hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
+  genome = c("hg19", "hg38"), platform = c("450k", "27k")){
+
+  message(sprintf("[%s] # Select informative sites #", Sys.time()))
+  # check parameters
   platform <- match.arg(platform)
   genome <- match.arg(genome)
   platform_data <- get(paste0("illumina", platform, "_", genome))
 
-  if (!missing(tumor)){
-    warning("'tumor' is deprecated. Use 'tumor_table' instead.")
-    tumor_table <- tumor
-  }
-  tumor_table <- as.matrix(tumor_table)
   diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
   assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100,
-    msg=paste("For computation efficiency convert tumor table",
-        "to percentage values."))
+    msg="For computation efficiency convert tumor table to percentage values.")
+  tumor_table <- as.matrix(tumor_table)
   tumor_table <- round(tumor_table)
   storage.mode(tumor_table) <- "integer"
 
   assertthat::assert_that(nrow(tumor_table) == length(auc))
   assertthat::assert_that(nrow(tumor_table) == nrow(platform_data),
-    msg=paste("nrow(tumor_table) not equal to nrow(platform_data)",
-      "Be sure to use correct platform and genome version and",
-      "to remove any non-'cg' probe from tumor_table."))
+    msg=paste("Number of rows of tumor_table is not equal to the number of rows of platform_data.",
+      "Be sure to use correct platform and genome version and to remove any non-'cg' probe from tumor_table."))
 
   max_sites <- as.integer(max_sites)
   assertthat::assert_that(max_sites %% 2 == 0, msg="max_sites is not even")
@@ -69,37 +62,41 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20,
   assertthat::assert_that(length(hyper_range) == 2)
   assertthat::assert_that(length(hypo_range) == 2)
 
-  message(sprintf("Genome: %s", genome))
-  message(sprintf("Platform: %s", platform))
-  message(sprintf("Number of sites: %i", max_sites))
-  message(sprintf("Miniminum distance between sites: %i bp", min_distance))
-  message(sprintf("Hyper-methylated sites range: %s", paste(hyper_range, collapse = " - ")))
-  message(sprintf("Hypo-methylated sites range: %s",  paste(hypo_range, collapse = " - ")))
+  message(sprintf("Selected genome: %s", genome))
+  message(sprintf("Selected platform: %s", platform))
+  message(sprintf("Selected number of sites to retrieve: %i", max_sites))
+  message(sprintf("Selected miniminum distance between sites: %g bps", min_distance))
+  message(sprintf("Selected hyper-methylated sites range: %i-%i", hyper_range[1], hyper_range[2]))
+  message(sprintf("Selected hyper-methylated sites range: %i-%i", hypo_range[1], hypo_range[2]))
 
   # minimum and maximum beta per site ----------------------------------------
-  beta_max <- suppressWarnings(apply(tumor_table, 1, max, na.rm = TRUE))
-  beta_min <- suppressWarnings(apply(tumor_table, 1, min, na.rm = TRUE))
-  hyper_idx <- which(beta_min < hyper_range[1] & beta_max > hyper_range[2] & auc > .80)
-  hypo_idx  <- which(beta_min < hypo_range[1]  & beta_max > hypo_range[2]  & auc < .20)
+  beta_high <- suppressWarnings(apply(tumor_table, 1, max, na.rm = TRUE))
+  beta_low  <- suppressWarnings(apply(tumor_table, 1, min, na.rm = TRUE))
+  hyper_idx <- which(beta_low < hyper_range[1] & beta_high > hyper_range[2] & auc > .80)
+  hypo_idx  <- which(beta_low < hypo_range[1]  & beta_high > hypo_range[2]  & auc < .20)
 
-  message(sprintf("[%s] Total hyper-methylated sites = %i", Sys.time(), length(hyper_idx)))
-  message(sprintf("[%s] Total hypo-methylated sites = %i",  Sys.time(), length(hypo_idx)))
+  message(sprintf("[%s] Total hyper-methylated sites retrieved = %i", Sys.time(), length(hyper_idx)))
+  message(sprintf("[%s] Total hypo-methylated sites retrieved = %i",  Sys.time(), length(hypo_idx)))
 
   ordered_hyper_idx <- hyper_idx[order(auc[hyper_idx], decreasing = TRUE)]
   ordered_hypo_idx  <- hypo_idx[order(auc[hypo_idx],   decreasing = FALSE)]
 
-  message(sprintf("[%s] Hyper-methylated sites cluster reduction...", Sys.time()))
+  message(sprintf("[%s] Reducing hyper-methylated clusters...", Sys.time()))
   top_hyper_idx <- cluster_reduction(ordered_hyper_idx, max_sites/2, min_distance, platform_data)
-  message(sprintf("[%s] Hypo-methylated sites cluster reduction...", Sys.time()))
-  top_hypo_idx <- cluster_reduction(ordered_hypo_idx, max_sites/2, min_distance, platform_data)
+  message(sprintf("[%s] Retrieved hyper-methylated sites = %i", Sys.time(), length(top_hyper_idx)))
 
-  list(hyper = top_hyper_idx, hypo = top_hypo_idx)
+  message(sprintf("[%s] Reducing hypo-methylated clusters...", Sys.time()))
+  top_hypo_idx <- cluster_reduction(ordered_hypo_idx, max_sites/2, min_distance, platform_data)
+  message(sprintf("[%s] Retrieved hypo-methylated sites = %i", Sys.time(), length(top_hypo_idx)))
+
+  message(sprintf("[%s] Done", Sys.time()))
+  return(list(hyper = top_hyper_idx, hypo = top_hypo_idx))
 }
 
 #' Remove CpG sites too close to each other
 #'
 #' Takes a vector of indexes (ordered by AUC) and
-#' removes sites within 'min_distance' (keep only one, per 'cluster'), keeping
+#' removes sites within 'min_distance' (keep one per 'cluster'), keeping
 #' at most N sites accoring to their order.
 #' @param sites_idx a vector of integers
 #' @param N number of sites to retrieve
@@ -109,21 +106,20 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20,
 #' @keywords internal
 #' @return a vector of indexes with close sites removed.
 cluster_reduction <- function(sites_idx, N, min_distance, platform_data){
+  # allocate space for possible sites
   top_idx <- rep(NA, length(sites_idx))
   i <- 1
   n <- 1
   while (n <= N & i <= length(sites_idx)) {
     idx <- sites_idx[i]
-    if (!too_close(idx, top_idx[!is.na(top_idx)], min_distance, platform_data)) {
+    if (!is_too_close(idx, top_idx[!is.na(top_idx)], min_distance, platform_data)) {
       top_idx[n] <- idx
       n <- n + 1
     }
     i <- i + 1
   }
-  top_idx <- top_idx[!is.na(top_idx)]
-  message(sprintf("[%s] %s sites retrieved after 'cluster reduction'.",
-    Sys.time(), length(top_idx)))
-  return(top_idx)
+  # remove NA leftovers
+  return(top_idx[!is.na(top_idx)])
 }
 
 #' Check whether a site is too close to the other sites or not
@@ -138,9 +134,9 @@ cluster_reduction <- function(sites_idx, N, min_distance, platform_data){
 #' (either \strong{450k} or \strong{27k}).
 #' @keywords internal
 #' @return logical
-too_close <- function(new_idx, prev_idxs, min_distance, platform_data){
+is_too_close <- function(new_idx, prev_idxs, min_distance, platform_data){
   if (length(prev_idxs) == 0) {
-    return(FALSE)
+    answer <- FALSE
   } else {
     new_site <- platform_data[new_idx,]
     other_sites <- platform_data[prev_idxs,]

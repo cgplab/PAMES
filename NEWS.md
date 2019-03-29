@@ -1,3 +1,17 @@
+# PAMES v2.0.0
+* PAMES have been rewritten to make the code simpler and the analysis run faster. 
+Thanks to [GMFranceschini](https://github.com/GMFranceschini) for suggesting to
+use `GenomicRanges`.
+
+* Removed function:
+    - `compute_islands_indexes.R`
+* Renamed functions:
+    - `reduce_to_islands.R` -> `reduce_to_regions.R`
+* Renamed data:
+    - `cpg_islands_df` -> `cpg_islands`
+* Removed data:
+    - `bs_toy_indexes`
+
 # PAMES v1.1.0
 
 * BUG correction: setting na_threshold to be greater than 1 didn't generate an error
@@ -6,7 +20,6 @@
 # PAMES v1.0.1
 
 * Faster compute_AUC thanks to Wilcoxon method
-
 
 # PAMES v1.0.0
 

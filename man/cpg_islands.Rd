@@ -3,14 +3,15 @@
 \docType{data}
 \name{cpg_islands}
 \alias{cpg_islands}
-\title{Deprecated data}
+\title{Curated set of CpG islands}
 \format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 26662 rows and 4 columns.}
+\source{
+\url{https://genome.ucsc.edu/}
+}
 \usage{
 cpg_islands
 }
 \description{
-Dataset has been renamed, use \code{cpg_islands_df} instead.
-Please change your code to use the new name, as
-the deprecated dataset will become defunct in future versions.
+Downloaded on 2016-03-01.
 }
 \keyword{datasets}

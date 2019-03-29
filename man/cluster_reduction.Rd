@@ -21,7 +21,7 @@ a vector of indexes with close sites removed.
 }
 \description{
 Takes a vector of indexes (ordered by AUC) and
-removes sites within 'min_distance' (keep only one, per 'cluster'), keeping
+removes sites within 'min_distance' (keep one per 'cluster'), keeping
 at most N sites accoring to their order.
 }
 \keyword{internal}
