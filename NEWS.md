@@ -1,3 +1,11 @@
+# PAMES v2.1.0
+* Faster and simplier cluster reduction in `select_informative_sites`
+* Removed internal functions:
+    - `is_too_close`
+    - `cluster_reduction`
+* Added variable `method` to `select_informative_sites` and `select_informative_regions`
+to select **even**, **top**, **hyper** or **hypo** methylated sites.
+
 # PAMES v2.0.0
 * PAMES have been rewritten to make the code simpler and the analysis run faster. 
 Thanks to [GMFranceschini](https://github.com/GMFranceschini) for suggesting to
