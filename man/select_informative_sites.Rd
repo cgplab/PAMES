@@ -7,7 +7,8 @@
 select_informative_sites(tumor_table, auc, max_sites = 20,
   min_distance = 1000000, hyper_range = c(min = 40, max = 90),
   hypo_range = c(min = 10, max = 60), genome = c("hg19", "hg38"),
-  platform = c("450k", "27k"))
+  platform = c("450k", "27k"), method = c("even", "top", "hyper",
+  "hypo"))
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}
@@ -17,7 +18,7 @@ select_informative_sites(tumor_table, auc, max_sites = 20,
 \item{max_sites}{Maximum number of sites to retrieve (half hyper-, half
 hypo-methylated) (default = 20).}
 
-\item{min_distance}{To avoid selection of CpG sites located within such
+\item{min_distance}{Avoid selection of CpG sites located within this
 distance from one another (default = 1e6 bps).}
 
 \item{hyper_range}{A vector of length 2 with minimum lower and upper values
@@ -31,6 +32,10 @@ each other (\strong{hg19} or \strong{hg38}).}
 
 \item{platform}{Illumina platform used in the experiment (\strong{450k} or
 \strong{27k}).}
+
+\item{method}{How to select sites: "even" (half hyper-, half hypo-methylated sites),
+"top" (highest AUC irregardless of hyper or hypomethylation), "hyper" (hyper-methylated sites only),
+"hypo" (hypo-methylated, sites only).}
 }
 \value{
 A named list of indexes of informative sites ("hyper-" and "hypo-methylated").

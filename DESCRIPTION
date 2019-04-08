@@ -14,9 +14,10 @@ Imports:
     parallel,
     GenomicRanges,
     IRanges,
-    assertthat
-Suggests:
+    assertthat,
     dplyr,
+    magrittr
+Suggests:
     knitr,
     rmarkdown,
     testthat
