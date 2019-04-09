@@ -43,9 +43,11 @@ test_that("reduce_to_regions works", {
 })
 test_that("select_informative_regions works", {
   reduced_tumor <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands)
+
   set.seed(252)
   auc <- runif(nrow(reduced_tumor))
   region_list <- select_informative_regions(reduced_tumor, auc)
+
   expect_type(region_list, "list")
   region_list <- select_informative_regions(reduced_tumor, auc, method="top")
   expect_type(region_list, "list")
