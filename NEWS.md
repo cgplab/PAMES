@@ -1,3 +1,7 @@
+# PAMES v2.2.0
+* Even faster cluster reduction
+* Fix bug: "top" method retrieved same sites of "hyper"
+
 # PAMES v2.1.0
 * Faster and simplier cluster reduction in `select_informative_sites`
 * Removed internal functions:

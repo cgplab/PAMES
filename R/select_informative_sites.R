@@ -85,7 +85,7 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20, min_dista
 
   # minimum and maximum beta per site ----------------------------------------
   max_beta <- suppressWarnings(apply(tumor_table, 1, max, na.rm = TRUE))
-  min_beta  <- suppressWarnings(apply(tumor_table, 1, min, na.rm = TRUE))
+  min_beta <- suppressWarnings(apply(tumor_table, 1, min, na.rm = TRUE))
 
   diff_meth_sites <- dplyr::tibble(Index = seq_along(auc),
                   AUC = auc,
@@ -94,44 +94,59 @@ select_informative_sites <- function(tumor_table, auc, max_sites = 20, min_dista
                   Chromosome = platform_data[[1]],
                   Position = platform_data[[2]]) %>%
       dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] ~ "Hyper",
-                                            AUC < .20 & Min_beta < hypo_range[1] & Max_beta > hypo_range[2] ~ "Hypo")) %>%
+                                            AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  ~ "Hypo")) %>%
       dplyr::filter(Type %in% c("Hypo", "Hyper")) %>%
       dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
       dplyr::arrange(-AUC)
 
   sites_hyper <- dplyr::filter(diff_meth_sites, Type == "Hyper")
+  sites_hypo <- dplyr::filter(diff_meth_sites, Type == "Hypo")
+  message(sprintf("[%s] Total hyper-methylated sites retrieved = %i", Sys.time(), nrow(sites_hyper)))
+  message(sprintf("[%s] Total hypo-methylated sites retrieved = %i", Sys.time(),  nrow(sites_hypo)))
+
   keep_site_hyper <- logical(nrow(sites_hyper))
   keep_site_hyper[1] <- TRUE
-  for (i in seq_along(keep_site_hyper)[-1]){
+  kept_sites <- 1
+  i <- 2
+  while (kept_sites < max_sites & i <= length(keep_site_hyper)){
     prev_pos <- sites_hyper$Position[seq_len(i-1)]
     prev_chr <- sites_hyper$Chromosome[seq_len(i-1)]
     curr_pos <- sites_hyper$Position[i]
     curr_chr <- sites_hyper$Chromosome[i]
-    keep_site_hyper[i] <- all(curr_chr != prev_chr | abs(curr_pos - prev_pos) >= min_distance)
+    keep_it <- all(curr_chr != prev_chr | abs(curr_pos - prev_pos) >= min_distance)
+    if (!is.na(keep_it) & keep_it) {
+      keep_site_hyper[i] <- keep_it
+      kept_sites <- kept_sites+1
+    }
+    i <- i + 1
   }
   top_hyper_sites <- sites_hyper[keep_site_hyper, ]
-  message(sprintf("[%s] Total hyper-methylated sites retrieved = %i", Sys.time(), nrow(top_hyper_sites)))
 
-  sites_hypo <- dplyr::filter(diff_meth_sites, Type == "Hypo")
   keep_site_hypo <- logical(nrow(sites_hypo))
   keep_site_hypo[1] <- TRUE
-  for (i in seq_along(keep_site_hypo)[-1]){
+  kept_sites <- 1
+  i <- 2
+  while (kept_sites < max_sites & i <= length(keep_site_hypo)){
     prev_pos <- sites_hypo$Position[seq_len(i-1)]
     prev_chr <- sites_hypo$Chromosome[seq_len(i-1)]
     curr_pos <- sites_hypo$Position[i]
     curr_chr <- sites_hypo$Chromosome[i]
-    keep_site_hypo[i] <- all(curr_chr != prev_chr | abs(curr_pos - prev_pos) >= min_distance)
+    keep_it <- all(curr_chr != prev_chr | abs(curr_pos - prev_pos) >= min_distance)
+    if (!is.na(keep_it) & keep_it) {
+      keep_site_hypo[i] <- keep_it
+      kept_sites <- kept_sites+1
+    }
+    i <- i + 1
   }
   top_hypo_sites <- sites_hypo[keep_site_hypo, ]
-  message(sprintf("[%s] Total hypo-methylated sites retrieved = %i", Sys.time(), nrow(top_hypo_sites)))
 
   if (method == "even") {
-      sites <- list(hyper = dplyr::slice(top_hyper_sites, seq_len(max_sites/2)) %>% dplyr::pull(Index),
-                    hypo  = dplyr::slice(top_hypo_sites, seq_len(max_sites/2)) %>% dplyr::pull(Index))
+      sites <- list(hyper = top_hyper_sites %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index),
+                    hypo  = top_hypo_sites %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index))
   } else if (method == "top") {
-      top_sites <- dplyr::bind_rows(top_hyper_sites, top_hypo_sites) %>% dplyr::slice(seq_len(max_sites))
-      sites <- list(hyper = dplyr::filter(top_sites, Type == "Hyper") %>% dplyr::pull(Index),
-                    hypo  = dplyr::filter(top_sites, Type == "Hypo") %>% dplyr::pull(Index))
+      top_sites <- dplyr::bind_rows(top_hyper_sites, top_hypo_sites) %>% dplyr::arrange(-AUC) %>% dplyr::slice(seq_len(max_sites))
+      sites <- list(hyper = top_sites %>% dplyr::filter(Type == "Hyper") %>% dplyr::pull(Index),
+                    hypo  = top_sites %>% dplyr::filter(Type == "Hypo")  %>% dplyr::pull(Index))
   } else if (method == "hyper") {
       sites <- list(hyper = dplyr::slice(top_hyper_sites, seq_len(max_sites)) %>% dplyr::pull(Index))
   } else if (method == "hypo") {

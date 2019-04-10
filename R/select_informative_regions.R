@@ -73,21 +73,21 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
       dplyr::arrange(-AUC)
 
   regions_hyper <- dplyr::filter(diff_meth_regions, Type == "Hyper")
-  message(sprintf("[%s] Total hyper-methylated regions retrieved = %i", Sys.time(), nrow(regions_hyper)))
   regions_hypo <- dplyr::filter(diff_meth_regions, Type == "Hypo")
+  message(sprintf("[%s] Total hyper-methylated regions retrieved = %i", Sys.time(), nrow(regions_hyper)))
   message(sprintf("[%s] Total hypo-methylated regions retrieved = %i", Sys.time(), nrow(regions_hypo)))
 
   if (method == "even") {
-      regions <- list(hyper = dplyr::slice(regions_hyper, seq_len(max_sites/2)) %>% dplyr::pull(Index),
-                      hypo  = dplyr::slice(regions_hypo, seq_len(max_sites/2)) %>% dplyr::pull(Index))
+      regions <- list(hyper = regions_hyper %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index),
+                      hypo  = regions_hypo  %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index))
   } else if (method == "top") {
-      top_regions <- dplyr::bind_rows(regions_hyper, regions_hypo) %>% dplyr::slice(seq_len(max_sites))
-      regions <- list(hyper = dplyr::filter(top_regions, Type == "Hyper") %>% dplyr::pull(Index),
-                      hypo  = dplyr::filter(top_regions, Type == "Hyper") %>% dplyr::pull(Index))
+      top_regions <- dplyr::bind_rows(regions_hyper, regions_hypo) %>% dplyr::arrange(-AUC) %>% dplyr::slice(seq_len(max_sites))
+      regions <- list(hyper = top_regions %>% dplyr::filter(Type == "Hyper") %>% dplyr::pull(Index),
+                      hypo  = top_regions %>% dplyr::filter(Type == "Hypo")  %>% dplyr::pull(Index))
   } else if (method == "hyper") {
-      regions <- list(hyper = dplyr::slice(regions_hyper, seq_len(max_sites)) %>% dplyr::pull(Index))
+      regions <- list(hyper = regions_hyper %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
   } else if (method == "hypo") {
-      regions <- list(hypo = dplyr::slice(regions_hypo, seq_len(max_sites)) %>% dplyr::pull(Index))
+      regions <- list(hypo = regions_hypo %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
   }
 
   message(sprintf("[%s] Retrieved hyper-methylated regions = %i", Sys.time(), length(regions$hyper)))

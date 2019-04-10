@@ -17,16 +17,15 @@ test_that("'selection_of_sites' errors and warnings", {
 test_that("'selection_of_sites' works", {
   set.seed(252)
   auc <- runif(nrow(tumor_toy_data))
-  site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "even")
   expect_error(select_informative_sites(tumor_toy_data, auc, max_sites = 19, platform="27"), "'method' is set to 'even'")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "even")
   expect_type(site_list, "list")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "top")
   expect_type(site_list, "list")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "hyper")
-  expect_length(site_list$hypo, 0)
+  expect_length(site_list$hyper, 18)
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "hypo")
-  expect_length(site_list$hyper, 0)
+  expect_length(site_list$hypo, 14)
 })
 
 context("CpG regions") ##################################################
@@ -43,11 +42,9 @@ test_that("reduce_to_regions works", {
 })
 test_that("select_informative_regions works", {
   reduced_tumor <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands)
-
   set.seed(252)
   auc <- runif(nrow(reduced_tumor))
   region_list <- select_informative_regions(reduced_tumor, auc)
-
   expect_type(region_list, "list")
   region_list <- select_informative_regions(reduced_tumor, auc, method="top")
   expect_type(region_list, "list")
