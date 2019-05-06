@@ -24,9 +24,9 @@ compute_AUC <- function(tumor_table, control_table, ncores = 1, na_threshold = 0
   assertthat::assert_that(na_threshold >= 0, na_threshold < 1)
 
   diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-  assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency convert tumor table to percentage values.")
+  assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency, convert tumor table to percentage values.")
   diff_range_c <- diff(range(control_table, na.rm = TRUE))
-  assertthat::assert_that(diff_range_c > 1, diff_range_c <= 100, msg="For computation efficiency convert control table to percentage values.")
+  assertthat::assert_that(diff_range_c > 1, diff_range_c <= 100, msg="For computation efficiency, convert control table to percentage values.")
 
   beta_table <- as.matrix(cbind(tumor_table, control_table))
   beta_table <- round(beta_table)

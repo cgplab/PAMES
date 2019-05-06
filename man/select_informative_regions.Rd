@@ -6,7 +6,8 @@
 \usage{
 select_informative_regions(tumor_table, auc, max_sites = 20,
   hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max =
-  60), method = c("even", "top", "hyper", "hypo"))
+  60), method = c("even", "top", "hyper", "hypo"), percentiles = c(0,
+  100), return_info = FALSE)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}
@@ -25,10 +26,13 @@ required to select hypo-methylated informative sites.}
 \item{method}{How to select sites: "even" (half hyper-, half hypo-methylated sites),
 "top" (highest AUC irregardless of hyper or hypomethylation), "hyper" (hyper-methylated sites only),
 "hypo" (hypo-methylated, sites only).}
+
+\item{percentiles}{Vector of length 2: lower and upper percentiles to
+select sites with beta values outside hypo- and hyper-ranges (default =
+0,100; 0th and 100th percentiles, i.e. only min and max beta should be outside of ranges).}
 }
 \value{
-A named list of indexes of informative regions ("hyper-" and
-"hypo-methylated").
+A named list of indexes of informative regions ("hyper-" and "hypo-methylated").
 }
 \description{
 This function generates a list of informative regions to be used to estimate

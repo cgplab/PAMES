@@ -18,8 +18,10 @@
 #' @param method How to select sites: "even" (half hyper-, half hypo-methylated sites),
 #' "top" (highest AUC irregardless of hyper or hypomethylation), "hyper" (hyper-methylated sites only),
 #' "hypo" (hypo-methylated, sites only).
-#' @return A named list of indexes of informative regions ("hyper-" and
-#' "hypo-methylated").
+#' @param percentiles Vector of length 2: lower and upper percentiles to
+#' select sites with beta values outside hypo- and hyper-ranges (default =
+#' 0,100; 0th and 100th percentiles, i.e. only min and max beta should be outside of ranges).
+#' @return A named list of indexes of informative regions ("hyper-" and "hypo-methylated").
 #' @importFrom dplyr "%>%"
 #' @export
 #' @examples
@@ -28,7 +30,7 @@
 #' info_regions <- select_informative_regions(reduced_data[,1:10], auc_data)
 select_informative_regions <- function(tumor_table, auc, max_sites = 20,
   hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
-  method = c("even", "top", "hyper", "hypo")){
+  method = c("even", "top", "hyper", "hypo"), percentiles = c(0, 100), return_info=FALSE){
 
   message(sprintf("[%s] # Select informative regions #", Sys.time()))
   # check parameters
@@ -53,22 +55,29 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
   assertthat::assert_that(length(hyper_range) == 2)
   assertthat::assert_that(length(hypo_range) == 2)
 
+  percentiles <- as.integer(percentiles)
+  assertthat::assert_that(length(percentiles) == 2)
+  assertthat::assert_that(percentiles[1] < percentiles[2], msg = "Min must be less than Max")
+  assertthat::assert_that(all(dplyr::between(percentiles, 0, 100)), msg = "Min and Max must be in the range 0-100")
+
   message(sprintf("Selected method: %s", method))
   message(sprintf("Selected number of regions to retrieve: %i", max_sites))
   message(sprintf("Selected hyper-methylated regions range: %i-%i", hyper_range[1], hyper_range[2]))
   message(sprintf("Selected hyper-methylated regions range: %i-%i", hypo_range[1], hypo_range[2]))
+  message(sprintf("Selected percentiles: %ith-%ith", percentiles[1], percentiles[2]))
 
-  # minimum and maximum beta per site ----------------------------------------
-  max_beta <- suppressWarnings(apply(tumor_table, 1, max, na.rm = TRUE))
-  min_beta  <- suppressWarnings(apply(tumor_table, 1, min, na.rm = TRUE))
+  # minimum and maximum beta per region ----------------------------------------
+  min_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[1]/100, na.rm = TRUE))
+  max_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[2]/100, na.rm = TRUE))
 
   diff_meth_regions <- dplyr::tibble(Index = seq_along(auc),
-                  AUC = auc,
-                  Max_beta = max_beta,
-                  Min_beta = min_beta) %>%
+                                     AUC = auc,
+                                     Max_beta = max_beta,
+                                     Min_beta = min_beta) %>%
       dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] ~ "Hyper",
-                                            AUC < .20 & Min_beta < hypo_range[1] & Max_beta > hypo_range[2] ~ "Hypo")) %>%
-      dplyr::filter(Type %in% c("Hypo", "Hyper")) %>%
+                                            AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  ~ "Hypo",
+                                            TRUE ~ "No_diff")) %>%
+      dplyr::filter(Type != "No_diff") %>%
       dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
       dplyr::arrange(-AUC)
 
@@ -94,5 +103,9 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
   message(sprintf("[%s] Retrieved hypo-methylated regions = %i", Sys.time(), length(regions$hypo)))
 
   message(sprintf("[%s] Done", Sys.time()))
-  return(regions)
+  if (return_info) {
+    return(list(regions, diff_meth_regions))
+  } else {
+    return(regions)
+  }
 }

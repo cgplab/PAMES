@@ -1,3 +1,6 @@
+# PAMES v2.3.0
+* Add `percentiles` parameter for a more flexible selection of sites
+
 # PAMES v2.2.0
 * Even faster cluster reduction
 * Fix bug: "top" method retrieved same sites of "hyper"

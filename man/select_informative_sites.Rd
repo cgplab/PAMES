@@ -8,7 +8,7 @@ select_informative_sites(tumor_table, auc, max_sites = 20,
   min_distance = 1000000, hyper_range = c(min = 40, max = 90),
   hypo_range = c(min = 10, max = 60), genome = c("hg19", "hg38"),
   platform = c("450k", "27k"), method = c("even", "top", "hyper",
-  "hypo"))
+  "hypo"), percentiles = c(0, 100), return_info = FALSE)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}
@@ -36,6 +36,12 @@ each other (\strong{hg19} or \strong{hg38}).}
 \item{method}{How to select sites: "even" (half hyper-, half hypo-methylated sites),
 "top" (highest AUC irregardless of hyper or hypomethylation), "hyper" (hyper-methylated sites only),
 "hypo" (hypo-methylated, sites only).}
+
+\item{percentiles}{Vector of length 2: lower and upper percentiles to
+select sites with beta values outside hypo- and hyper-ranges (default =
+0,100; 0th and 100th percentiles, i.e. only min and max beta should be outside of ranges).}
+
+\item{return_info}{Return also a data.frame of all informative sites (for debug purpose).}
 }
 \value{
 A named list of indexes of informative sites ("hyper-" and "hypo-methylated").

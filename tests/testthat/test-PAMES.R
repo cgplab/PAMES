@@ -18,6 +18,7 @@ test_that("'selection_of_sites' works", {
   set.seed(252)
   auc <- runif(nrow(tumor_toy_data))
   expect_error(select_informative_sites(tumor_toy_data, auc, max_sites = 19, platform="27"), "'method' is set to 'even'")
+  expect_error(select_informative_sites(tumor_toy_data, auc, percentiles = c(0,1000), platform="27"), "range 0-100")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "even")
   expect_type(site_list, "list")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "top")
@@ -26,6 +27,8 @@ test_that("'selection_of_sites' works", {
   expect_length(site_list$hyper, 18)
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "hypo")
   expect_length(site_list$hypo, 14)
+  site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", percentiles=c(5,95))
+  expect_length(site_list$hyper, 10)
 })
 
 context("CpG regions") ##################################################
@@ -52,6 +55,8 @@ test_that("select_informative_regions works", {
   expect_length(region_list$hyper, 20)
   region_list <- select_informative_regions(reduced_tumor, auc, method="hypo")
   expect_length(region_list$hypo, 20)
+  region_list <- select_informative_regions(reduced_tumor, auc, percentiles=c(5,95))
+  expect_length(region_list$hypo, 10)
 })
 
 context("Compute purity") ##################################################
