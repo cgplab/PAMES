@@ -23,6 +23,7 @@ compute_AUC <- function(tumor_table, control_table, ncores = 1, na_threshold = 0
   na_threshold <- as.numeric(na_threshold)
   assertthat::assert_that(na_threshold >= 0, na_threshold < 1)
 
+  assertthat::assert_that(nrow(tumor_table) == nrow(control_table))
   diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
   assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency, convert tumor table to percentage values.")
   diff_range_c <- diff(range(control_table, na.rm = TRUE))
@@ -43,7 +44,7 @@ compute_AUC <- function(tumor_table, control_table, ncores = 1, na_threshold = 0
   message(sprintf("[%s] Computing...", Sys.time()))
   auc <- rep(NA_real_, nrow(beta_table))
   cl <- parallel::makeCluster(ncores)
-  auc[valid_sites] <- parallel::parApply(cl, beta_table[valid_sites,], 1, single_AUC, is_tumor = is_tumor)
+  auc[valid_sites] <- parallel::parApply(cl, beta_table[valid_sites,,drop=FALSE], 1, single_AUC, is_tumor = is_tumor)
   parallel::stopCluster(cl)
 
   message(sprintf("[%s] Done",  Sys.time()))

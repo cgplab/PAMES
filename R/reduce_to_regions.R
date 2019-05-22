@@ -28,8 +28,7 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
   diff_range <- diff(range(beta_table, na.rm = TRUE))
   assertthat::assert_that(diff_range > 1, diff_range <= 100,
     msg=paste("For computation efficiency convert table to percentage values."))
-  beta_table <- as.matrix(beta_table)
-  beta_table <- round(beta_table)
+  beta_table <- round(as.matrix(beta_table))
   storage.mode(beta_table) <- "integer"
 
   if (ncol(cpg_regions) < 4) {

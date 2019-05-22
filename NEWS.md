@@ -1,3 +1,6 @@
+# PAMES v2.3.1
+* Fix bug in compute_AUC
+
 # PAMES v2.3.0
 * Add `percentiles` parameter for a more flexible selection of sites
 
