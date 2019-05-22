@@ -42,6 +42,7 @@ test_that("reduce_to_regions works", {
   expect_error(reduce_to_regions(tumor_toy_data, illumina27k_hg19, cpg_islands), "No shared chromosomes")
   reduced_tumor <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands)
   expect_is(reduced_tumor, "matrix")
+  expect_equal(nrow(reduced_tumor), nrow(cpg_islands))
 })
 test_that("select_informative_regions works", {
   reduced_tumor <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands)
