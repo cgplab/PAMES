@@ -1,5 +1,8 @@
-# PAMES v2.3.2
-* Fix bug in `reduce_to_regions` (see issue #6)
+# PAMES v2.3.4
+* Add platform parameter to address issue [#7](https://github.com/cgplab/PAMES/issues/7))
+
+# PAMES v2.3.3
+* Fix bug in `reduce_to_regions` (see issue [#6](https://github.com/cgplab/PAMES/issues/6))
 
 # PAMES v2.3.1
 * Fix bug in `compute_AUC`

@@ -12,9 +12,15 @@
 #' @export
 #' @examples
 #' purity <- compute_purity(tumor_toy_data, list(hyper=c(1, 10, 20), hypo=c(15,30,45)))
-compute_purity <- function(tumor_table, list_of_sites) {
+compute_purity <- function(tumor_table, list_of_sites, platform = c("450k", "27k")) {
   message(sprintf("[%s] # Compute purity #", Sys.time()))
   # check parameters
+  platform <- match.arg(platform)
+  if (platform == "450k" & nrow(tumor_table) != 482421){
+      stop("tumor_table 450k expected to have 482421 rows")
+  } else if (platform == "27k" & nrow(tumor_table) != 27578){
+      stop("tumor_table 27k expected to have 27578 rows")
+  }
   assertthat::assert_that(is.list(list_of_sites))
   assertthat::assert_that(any(names(list_of_sites) %in% c("hyper", "hypo")))
   diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
