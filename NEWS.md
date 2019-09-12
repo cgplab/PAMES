@@ -1,5 +1,8 @@
+# PAMES v2.3.5
+* `compute_AUC` now returns a vector with the names of the CpG probes.
+
 # PAMES v2.3.4
-* Add platform parameter to address issue [#7](https://github.com/cgplab/PAMES/issues/7))
+* Add `platform` parameter to `compute_purity` to address issue [#7](https://github.com/cgplab/PAMES/issues/7))
 
 # PAMES v2.3.3
 * Fix bug in `reduce_to_regions` (see issue [#6](https://github.com/cgplab/PAMES/issues/6))

@@ -39,12 +39,12 @@ compute_AUC <- function(tumor_table, control_table, ncores = 1, na_threshold = 0
   message(sprintf("[%s] Selecting sites with fraction of NAs \u2264 %.2f...", Sys.time(), na_threshold))
   tumor_valid_sites <- rowSums(is.na(beta_table[,is_tumor]))/sum(is_tumor) <= na_threshold
   control_valid_sites <- rowSums(is.na(beta_table[,!is_tumor]))/sum(!is_tumor) <= na_threshold
-  valid_sites <- which(tumor_valid_sites & control_valid_sites)
+  valid_sites_idx <- which(tumor_valid_sites & control_valid_sites)
 
   message(sprintf("[%s] Computing...", Sys.time()))
-  auc <- rep(NA_real_, nrow(beta_table))
+  auc <- setNames(rep(NA_real_, nrow(beta_table)), rownames(beta_table))
   cl <- parallel::makeCluster(ncores)
-  auc[valid_sites] <- parallel::parApply(cl, beta_table[valid_sites,,drop=FALSE], 1, single_AUC, is_tumor = is_tumor)
+  auc[valid_sites_idx] <- parallel::parApply(cl, beta_table[valid_sites_idx,,drop=FALSE], 1, single_AUC, is_tumor = is_tumor)
   parallel::stopCluster(cl)
 
   message(sprintf("[%s] Done",  Sys.time()))
