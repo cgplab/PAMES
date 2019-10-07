@@ -47,8 +47,9 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
   reduced_table <- matrix(NA, length(regions_range), ncol(beta_table),
                           dimnames = list(names(regions_range), colnames(beta_table)))
   # insert reduced beta values at appropriate positions (leave uncovered regions to NA)
-  reduced_table[unique(overlaps@from),] <- do.call(rbind, tapply(overlaps@to, overlaps@from,
-          function(idx) {median_of_region(beta_table[idx, , drop = FALSE], min_CpGs)}))
+  reduced_table[unique(S4Vectors::from(overlaps)),] <- do.call(rbind,
+        tapply(S4Vectors::to(overlaps), S4Vectors::from(overlaps),
+               function(idx) {median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)}))
 
   message(sprintf("[%s] Done",  Sys.time()))
   return(reduced_table)
