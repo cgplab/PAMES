@@ -53,11 +53,11 @@ the purity of a set of tumor samples.
 \details{
 Informative sites are divided into \code{hyper} and \code{hypo} depending on
 their level of methylation with respect to the average beta-score of normal
-samples. Both sets will be used to compute purity.
+samples. Both sets are used to compute purity.
 }
 \examples{
 ## WARNING: The following code doesn't retrieve any informative site
-## Its only purpose is to show how to use the tool
+## Its purpose is to show how to use the tool
 auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
 info_sites <- select_informative_sites(tumor_toy_data, auc_data, platform="27k")
 info_sites.hg38 <- select_informative_sites(tumor_toy_data, auc_data, platform="27k", genome="hg38")

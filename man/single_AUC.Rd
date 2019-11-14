@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_AUC.R
 \name{single_AUC}
 \alias{single_AUC}
-\title{Compute AUC a single vector}
+\title{Compute AUC}
 \usage{
 single_AUC(scores, is_tumor)
 }

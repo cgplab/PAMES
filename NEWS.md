@@ -1,3 +1,7 @@
+# PAMES v2.4.0
+* deprecated parameter na_threshold in favor of min_sample_frac `compute_AUC` 
+* added simplify parameter: if false return a data.frame reporting fraction of NA samples per site
+
 # PAMES v2.3.5
 * `compute_AUC` now returns a vector with the names of the CpG probes.
 

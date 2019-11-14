@@ -4,7 +4,8 @@
 \alias{compute_AUC}
 \title{Compute Area Under Curve for a matrix of samples}
 \usage{
-compute_AUC(tumor_table, control_table, ncores = 1, na_threshold = 0)
+compute_AUC(tumor_table, control_table, ncores = 1, na_threshold,
+  simplify = TRUE, min_samples_frac = 1)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}
@@ -13,17 +14,24 @@ compute_AUC(tumor_table, control_table, ncores = 1, na_threshold = 0)
 
 \item{ncores}{Number of parallel processes to use for parallel computing.}
 
-\item{na_threshold}{Fraction of NAs (considered independently in tumor and
+\item{na_threshold}{(DEPRECATED) Fraction of NAs (considered independently in tumor and
 control samples) above which a site will not be selected (default=0).}
+
+\item{simplify}{If TRUE (default) return a vector else compute all AUC and return a data.frame
+reporting fraction of NAs in tumor and control tables.}
+
+\item{min_samples_frac}{Fraction of samples (independently in tumor and
+control samples) that are not NA required to analyze a site (default=100).}
 }
 \value{
-A vector of AUC scores.
+A vector of AUC scores (NA if not analyzed) or a data.frame with AUC scores
+and the fraction of non-NA samples in tumor and contol tables.
 }
 \description{
-This function computes the Area Under Curve used to define the
-segregation between tumor and control samples accordingly to their
-methylation (beta) values.
+This function computes the Area Under Curve used to define the segregation
+between tumor and control samples accordingly to their methylation (beta)
+values.
 }
 \examples{
-auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
+auc_data <- compute_AUC(tumor_toy_table, control_toy_table)
 }
