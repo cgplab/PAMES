@@ -13,28 +13,28 @@
 #' @examples
 #' purity <- compute_purity(tumor_toy_data, list(hyper=c(1, 10, 20), hypo=c(15,30,45)))
 compute_purity <- function(tumor_table, list_of_sites, platform = c("450k", "27k")) {
-  message(sprintf("[%s] # Compute purity #", Sys.time()))
-  # check parameters
-  platform <- match.arg(platform)
-  if (platform == "450k" & nrow(tumor_table) != 482421){
-      stop("tumor_table 450k expected to have 482421 rows")
-  } else if (platform == "27k" & nrow(tumor_table) != 27578){
-      stop("tumor_table 27k expected to have 27578 rows")
-  }
-  assertthat::assert_that(is.list(list_of_sites))
-  assertthat::assert_that(any(names(list_of_sites) %in% c("hyper", "hypo")))
-  diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-  if (diff_range_t < 0 | diff_range_t > 100){
-      stop("Unexpected range of beta values.")
-  } else if (diff_range_t <= 1){
-      max_purity <- 1
-  } else if (diff_range_t <= 100) {
-      max_purity <- 100
-  }
+    message(sprintf("[%s] # Compute purity #", Sys.time()))
+    # check parameters
+    platform <- match.arg(platform)
+    if (platform == "450k" & nrow(tumor_table) != 482421){
+        stop("tumor_table 450k expected to have 482421 rows")
+    } else if (platform == "27k" & nrow(tumor_table) != 27578){
+        stop("tumor_table 27k expected to have 27578 rows")
+    }
+    assertthat::assert_that(is.list(list_of_sites))
+    assertthat::assert_that(any(names(list_of_sites) %in% c("hyper", "hypo")))
+    diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
+    if (diff_range_t < 0 | diff_range_t > 100){
+        stop("Unexpected range of beta values.")
+    } else if (diff_range_t <= 1){
+        max_purity <- 1
+    } else if (diff_range_t <= 100) {
+        max_purity <- 100
+    }
 
-  beta_values <- rbind(tumor_table[list_of_sites[["hyper"]],],
-                       max_purity - tumor_table[list_of_sites[["hypo"]],])
-  purity <- apply(beta_values, 2, median, na.rm = TRUE)
-  message(sprintf("[%s] Done",  Sys.time()))
-  return(purity)
+    beta_values <- rbind(tumor_table[list_of_sites[["hyper"]],],
+                         max_purity - tumor_table[list_of_sites[["hypo"]],])
+    purity <- apply(beta_values, 2, median, na.rm = TRUE)
+    message(sprintf("[%s] Done",  Sys.time()))
+    return(purity)
 }

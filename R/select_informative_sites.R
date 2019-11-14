@@ -38,137 +38,137 @@
 #' info_sites <- select_informative_sites(tumor_toy_data, auc_data, platform="27k")
 #' info_sites.hg38 <- select_informative_sites(tumor_toy_data, auc_data, platform="27k", genome="hg38")
 select_informative_sites <- function(tumor_table, auc, max_sites = 20, min_distance = 1e6,
-  hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
-  genome = c("hg19", "hg38"), platform = c("450k", "27k"),
-  method = c("even", "top", "hyper", "hypo"), percentiles = c(0, 100), return_info=FALSE){
+    hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
+    genome = c("hg19", "hg38"), platform = c("450k", "27k"),
+    method = c("even", "top", "hyper", "hypo"), percentiles = c(0, 100), return_info=FALSE){
 
-  message(sprintf("[%s] # Select informative sites #", Sys.time()))
-  # check parameters
-  platform <- match.arg(platform)
-  genome <- match.arg(genome)
-  if (genome == "hg19"){
-    platform_data <- get(paste0("illumina", platform, "_", genome))[3:4]
-  } else {
-    platform_data <- get(paste0("illumina", platform, "_", genome))[2:3]
-  }
-  method <- match.arg(method)
+    message(sprintf("[%s] # Select informative sites #", Sys.time()))
+    # check parameters
+    platform <- match.arg(platform)
+    genome <- match.arg(genome)
+    if (genome == "hg19"){
+        platform_data <- get(paste0("illumina", platform, "_", genome))[3:4]
+    } else {
+        platform_data <- get(paste0("illumina", platform, "_", genome))[2:3]
+    }
+    method <- match.arg(method)
 
-  diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-  assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100,
-    msg="For computation efficiency convert tumor table to percentage values.")
-  tumor_table <- as.matrix(tumor_table)
-  tumor_table <- round(tumor_table)
-  storage.mode(tumor_table) <- "integer"
+    diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
+    assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100,
+                            msg="For computation efficiency convert tumor table to percentage values.")
+    tumor_table <- as.matrix(tumor_table)
+    tumor_table <- round(tumor_table)
+    storage.mode(tumor_table) <- "integer"
 
-  assertthat::assert_that(nrow(tumor_table) == length(auc))
-  assertthat::assert_that(nrow(tumor_table) == nrow(platform_data),
-    msg=paste("Number of rows of tumor_table is not equal to the number of rows of platform_data.",
-      "Be sure to use correct platform and genome version and to remove any non-'cg' probe from tumor_table."))
+    assertthat::assert_that(nrow(tumor_table) == length(auc))
+    assertthat::assert_that(nrow(tumor_table) == nrow(platform_data),
+                            msg=paste("Number of rows of tumor_table is not equal to the number of rows of platform_data.",
+                                      "Be sure to use correct platform and genome version and to remove any non-'cg' probe from tumor_table."))
 
-  max_sites <- as.integer(max_sites)
-  if (method == "even") {
-    assertthat::assert_that(max_sites %% 2 == 0,
-        msg="'method' is set to 'even' but 'max_sites' is not even")
-  }
+    max_sites <- as.integer(max_sites)
+    if (method == "even") {
+        assertthat::assert_that(max_sites %% 2 == 0,
+                                msg="'method' is set to 'even' but 'max_sites' is not even")
+    }
 
-  min_distance <- as.integer(min_distance)
-  assertthat::assert_that(min_distance > 0)
+    min_distance <- as.integer(min_distance)
+    assertthat::assert_that(min_distance > 0)
 
-  hyper_range <- as.numeric(hyper_range)
-  hypo_range <- as.numeric(hypo_range)
-  assertthat::assert_that(length(hyper_range) == 2)
-  assertthat::assert_that(length(hypo_range) == 2)
+    hyper_range <- as.numeric(hyper_range)
+    hypo_range <- as.numeric(hypo_range)
+    assertthat::assert_that(length(hyper_range) == 2)
+    assertthat::assert_that(length(hypo_range) == 2)
 
-  percentiles <- as.integer(percentiles)
-  assertthat::assert_that(length(percentiles) == 2)
-  assertthat::assert_that(percentiles[1] < percentiles[2], msg = "Min must be less than Max")
-  assertthat::assert_that(all(dplyr::between(percentiles, 0, 100)), msg = "Min and Max must be in the range 0-100")
+    percentiles <- as.integer(percentiles)
+    assertthat::assert_that(length(percentiles) == 2)
+    assertthat::assert_that(percentiles[1] < percentiles[2], msg = "Min must be less than Max")
+    assertthat::assert_that(all(dplyr::between(percentiles, 0, 100)), msg = "Min and Max must be in the range 0-100")
 
-  message(sprintf("Selected genome: %s", genome))
-  message(sprintf("Selected platform: %s", platform))
-  message(sprintf("Selected method: %s", method))
-  message(sprintf("Selected miniminum distance between sites: %g bps", min_distance))
-  message(sprintf("Selected number of sites to retrieve: %i", max_sites))
-  message(sprintf("Selected hyper-methylated sites range: %i-%i", hyper_range[1], hyper_range[2]))
-  message(sprintf("Selected hyper-methylated sites range: %i-%i", hypo_range[1], hypo_range[2]))
-  message(sprintf("Selected percentiles: %ith-%ith", percentiles[1], percentiles[2]))
+    message(sprintf("Selected genome: %s", genome))
+    message(sprintf("Selected platform: %s", platform))
+    message(sprintf("Selected method: %s", method))
+    message(sprintf("Selected miniminum distance between sites: %g bps", min_distance))
+    message(sprintf("Selected number of sites to retrieve: %i", max_sites))
+    message(sprintf("Selected hyper-methylated sites range: %i-%i", hyper_range[1], hyper_range[2]))
+    message(sprintf("Selected hyper-methylated sites range: %i-%i", hypo_range[1], hypo_range[2]))
+    message(sprintf("Selected percentiles: %ith-%ith", percentiles[1], percentiles[2]))
 
-  # minimum and maximum beta per site ----------------------------------------
-  min_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[1]/100, na.rm = TRUE))
-  max_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[2]/100, na.rm = TRUE))
+    # minimum and maximum beta per site ----------------------------------------
+    min_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[1]/100, na.rm = TRUE))
+    max_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[2]/100, na.rm = TRUE))
 
-  diff_meth_sites <- dplyr::tibble(Index = seq_along(auc),
-                                   AUC = auc,
-                                   Max_beta = max_beta,
-                                   Min_beta = min_beta,
-                                   Chromosome = platform_data[[1]],
-                                   Position = platform_data[[2]]) %>%
-      dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] ~ "Hyper",
-                                            AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  ~ "Hypo",
-                                            TRUE ~ "No_diff")) %>%
-      dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
-      dplyr::arrange(-AUC)
+    diff_meth_sites <- dplyr::tibble(Index = seq_along(auc),
+                                     AUC = auc,
+                                     Max_beta = max_beta,
+                                     Min_beta = min_beta,
+                                     Chromosome = platform_data[[1]],
+                                     Position = platform_data[[2]]) %>%
+    dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] ~ "Hyper",
+                                          AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  ~ "Hypo",
+                                          TRUE ~ "No_diff")) %>%
+    dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
+    dplyr::arrange(-AUC)
 
-  sites_hyper <- dplyr::filter(diff_meth_sites, Type == "Hyper")
-  sites_hypo <- dplyr::filter(diff_meth_sites, Type == "Hypo")
-  message(sprintf("[%s] Total hyper-methylated sites retrieved = %i", Sys.time(), nrow(sites_hyper)))
-  message(sprintf("[%s] Total hypo-methylated sites retrieved = %i", Sys.time(),  nrow(sites_hypo)))
+sites_hyper <- dplyr::filter(diff_meth_sites, Type == "Hyper")
+sites_hypo <- dplyr::filter(diff_meth_sites, Type == "Hypo")
+message(sprintf("[%s] Total hyper-methylated sites retrieved = %i", Sys.time(), nrow(sites_hyper)))
+message(sprintf("[%s] Total hypo-methylated sites retrieved = %i", Sys.time(),  nrow(sites_hypo)))
 
-  keep_site_hyper <- logical(nrow(sites_hyper))
-  keep_site_hyper[1] <- TRUE
-  kept_sites <- 1
-  i <- 2
-  while (kept_sites < max_sites & i <= length(keep_site_hyper)){
+keep_site_hyper <- logical(nrow(sites_hyper))
+keep_site_hyper[1] <- TRUE
+kept_sites <- 1
+i <- 2
+while (kept_sites < max_sites & i <= length(keep_site_hyper)){
     prev_pos <- sites_hyper$Position[seq_len(i-1)]
     prev_chr <- sites_hyper$Chromosome[seq_len(i-1)]
     curr_pos <- sites_hyper$Position[i]
     curr_chr <- sites_hyper$Chromosome[i]
     keep_it <- all(curr_chr != prev_chr | abs(curr_pos - prev_pos) >= min_distance)
     if (!is.na(keep_it) & keep_it) {
-      keep_site_hyper[i] <- keep_it
-      kept_sites <- kept_sites+1
+        keep_site_hyper[i] <- keep_it
+        kept_sites <- kept_sites+1
     }
     i <- i + 1
-  }
-  top_hyper_sites <- sites_hyper[keep_site_hyper, ]
+}
+top_hyper_sites <- sites_hyper[keep_site_hyper, ]
 
-  keep_site_hypo <- logical(nrow(sites_hypo))
-  keep_site_hypo[1] <- TRUE
-  kept_sites <- 1
-  i <- 2
-  while (kept_sites < max_sites & i <= length(keep_site_hypo)){
+keep_site_hypo <- logical(nrow(sites_hypo))
+keep_site_hypo[1] <- TRUE
+kept_sites <- 1
+i <- 2
+while (kept_sites < max_sites & i <= length(keep_site_hypo)){
     prev_pos <- sites_hypo$Position[seq_len(i-1)]
     prev_chr <- sites_hypo$Chromosome[seq_len(i-1)]
     curr_pos <- sites_hypo$Position[i]
     curr_chr <- sites_hypo$Chromosome[i]
     keep_it <- all(curr_chr != prev_chr | abs(curr_pos - prev_pos) >= min_distance)
     if (!is.na(keep_it) & keep_it) {
-      keep_site_hypo[i] <- keep_it
-      kept_sites <- kept_sites+1
+        keep_site_hypo[i] <- keep_it
+        kept_sites <- kept_sites+1
     }
     i <- i + 1
-  }
-  top_hypo_sites <- sites_hypo[keep_site_hypo, ]
+}
+top_hypo_sites <- sites_hypo[keep_site_hypo, ]
 
-  if (method == "even") {
-      sites <- list(hyper = top_hyper_sites %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index),
-                    hypo  = top_hypo_sites %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index))
-  } else if (method == "top") {
-      top_sites <- dplyr::bind_rows(top_hyper_sites, top_hypo_sites) %>% dplyr::arrange(-AUC) %>% dplyr::slice(seq_len(max_sites))
-      sites <- list(hyper = top_sites %>% dplyr::filter(Type == "Hyper") %>% dplyr::pull(Index),
-                    hypo  = top_sites %>% dplyr::filter(Type == "Hypo")  %>% dplyr::pull(Index))
-  } else if (method == "hyper") {
-      sites <- list(hyper = dplyr::slice(top_hyper_sites, seq_len(max_sites)) %>% dplyr::pull(Index))
-  } else if (method == "hypo") {
-      sites <- list(hypo = dplyr::slice(top_hypo_sites, seq_len(max_sites)) %>% dplyr::pull(Index))
-  }
-  message(sprintf("[%s] Retrieved hyper-methylated sites = %i", Sys.time(), length(sites$hyper)))
-  message(sprintf("[%s] Retrieved hypo-methylated sites = %i", Sys.time(), length(sites$hypo)))
+if (method == "even") {
+    sites <- list(hyper = top_hyper_sites %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index),
+                  hypo  = top_hypo_sites %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index))
+} else if (method == "top") {
+    top_sites <- dplyr::bind_rows(top_hyper_sites, top_hypo_sites) %>% dplyr::arrange(-AUC) %>% dplyr::slice(seq_len(max_sites))
+    sites <- list(hyper = top_sites %>% dplyr::filter(Type == "Hyper") %>% dplyr::pull(Index),
+                  hypo  = top_sites %>% dplyr::filter(Type == "Hypo")  %>% dplyr::pull(Index))
+} else if (method == "hyper") {
+    sites <- list(hyper = dplyr::slice(top_hyper_sites, seq_len(max_sites)) %>% dplyr::pull(Index))
+} else if (method == "hypo") {
+    sites <- list(hypo = dplyr::slice(top_hypo_sites, seq_len(max_sites)) %>% dplyr::pull(Index))
+}
+message(sprintf("[%s] Retrieved hyper-methylated sites = %i", Sys.time(), length(sites$hyper)))
+message(sprintf("[%s] Retrieved hypo-methylated sites = %i", Sys.time(), length(sites$hypo)))
 
-  message(sprintf("[%s] Done", Sys.time()))
-  if (return_info) {
+message(sprintf("[%s] Done", Sys.time()))
+if (return_info) {
     return(list(sites, diff_meth_sites))
-  } else {
+} else {
     return(sites)
-  }
+}
 }

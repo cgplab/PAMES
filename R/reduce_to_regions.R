@@ -17,42 +17,42 @@
 #' @examples
 #' reduced_data <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands[1:10,])
 reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
-  message(sprintf("[%s] # Reduce to regions #", Sys.time()))
-  # check parameters
-  min_CpGs <- as.integer(min_CpGs)
-  assertthat::assert_that(min_CpGs > 0)
-  assertthat::assert_that(ncol(cpg_sites) >= 2)
-  assertthat::assert_that(ncol(cpg_regions) >= 3)
-  assertthat::assert_that(length(intersect(cpg_regions[[1]], cpg_sites[[1]])) > 0,
-    msg="No shared chromosomes between cpg_sites and cpg_regions. Check chromosome names.")
-  diff_range <- diff(range(beta_table, na.rm = TRUE))
-  assertthat::assert_that(diff_range > 1, diff_range <= 100,
-    msg=paste("For computation efficiency convert table to percentage values."))
-  beta_table <- round(as.matrix(beta_table))
-  storage.mode(beta_table) <- "integer"
+    message(sprintf("[%s] # Reduce to regions #", Sys.time()))
+    # check parameters
+    min_CpGs <- as.integer(min_CpGs)
+    assertthat::assert_that(min_CpGs > 0)
+    assertthat::assert_that(ncol(cpg_sites) >= 2)
+    assertthat::assert_that(ncol(cpg_regions) >= 3)
+    assertthat::assert_that(length(intersect(cpg_regions[[1]], cpg_sites[[1]])) > 0,
+                            msg="No shared chromosomes between cpg_sites and cpg_regions. Check chromosome names.")
+    diff_range <- diff(range(beta_table, na.rm = TRUE))
+    assertthat::assert_that(diff_range > 1, diff_range <= 100,
+                            msg=paste("For computation efficiency convert table to percentage values."))
+    beta_table <- round(as.matrix(beta_table))
+    storage.mode(beta_table) <- "integer"
 
-  if (ncol(cpg_regions) < 4) {
-    cpg_regions[[4]] <- paste0("CpG_", seq_len(nrow(cpg_regions)))
-  }
+    if (ncol(cpg_regions) < 4) {
+        cpg_regions[[4]] <- paste0("CpG_", seq_len(nrow(cpg_regions)))
+    }
 
-  message(sprintf("[%s] Finding overlaps...",  Sys.time()))
-  regions_range <- GenomicRanges::GRanges(seqnames = cpg_regions[[1]],
-                ranges = IRanges::IRanges(start = cpg_regions[[2]],
-                                          end = cpg_regions[[3]],
-                                          names = cpg_regions[[4]]))
-  sites_range <- GenomicRanges::GRanges(cpg_sites[[1]], ranges = IRanges::IRanges(start=cpg_sites[[2]], width=1))
-  overlaps <- GenomicRanges::findOverlaps(regions_range, sites_range)
+    message(sprintf("[%s] Finding overlaps...",  Sys.time()))
+    regions_range <- GenomicRanges::GRanges(seqnames = cpg_regions[[1]],
+                                            ranges = IRanges::IRanges(start = cpg_regions[[2]],
+                                                                      end = cpg_regions[[3]],
+                                                                      names = cpg_regions[[4]]))
+    sites_range <- GenomicRanges::GRanges(cpg_sites[[1]], ranges = IRanges::IRanges(start=cpg_sites[[2]], width=1))
+    overlaps <- GenomicRanges::findOverlaps(regions_range, sites_range)
 
-  message(sprintf("[%s] Reducing beta values...",  Sys.time())) #
-  reduced_table <- matrix(NA, length(regions_range), ncol(beta_table),
-                          dimnames = list(names(regions_range), colnames(beta_table)))
-  # insert reduced beta values at appropriate positions (leave uncovered regions to NA)
-  reduced_table[unique(S4Vectors::from(overlaps)),] <- do.call(rbind,
-        tapply(S4Vectors::to(overlaps), S4Vectors::from(overlaps),
-               function(idx) {median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)}))
+    message(sprintf("[%s] Reducing beta values...",  Sys.time())) #
+    reduced_table <- matrix(NA, length(regions_range), ncol(beta_table),
+                            dimnames = list(names(regions_range), colnames(beta_table)))
+    # insert reduced beta values at appropriate positions (leave uncovered regions to NA)
+    reduced_table[unique(S4Vectors::from(overlaps)),] <- do.call(rbind,
+                                                                 tapply(S4Vectors::to(overlaps), S4Vectors::from(overlaps),
+                                                                        function(idx) {median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)}))
 
-  message(sprintf("[%s] Done",  Sys.time()))
-  return(reduced_table)
+    message(sprintf("[%s] Done",  Sys.time()))
+    return(reduced_table)
 }
 
 #' Transform CpG sites to one CpG region
@@ -67,8 +67,8 @@ median_of_region <- function(x, n) {
     valid_sites <- which(!rowSums(is.na(x)) == ncol(x))
     x <- x[valid_sites, , drop=FALSE]
     if (nrow(x) < n) {
-      return(NA)
+        return(NA)
     } else {
-      return(apply(x, 2, median, na.rm = TRUE))
+        return(apply(x, 2, median, na.rm = TRUE))
     }
 }
