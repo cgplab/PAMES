@@ -4,7 +4,7 @@
 \alias{compute_purity}
 \title{Compute Purity of Tumor Samples}
 \usage{
-compute_purity(tumor_table, list_of_sites, platform = c("450k", "27k"))
+compute_purity(tumor_table, list_of_sites, platform)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values from tumor samples.}

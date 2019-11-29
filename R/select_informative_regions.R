@@ -34,39 +34,43 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
 
     message(sprintf("[%s] # Select informative regions #", Sys.time()))
     # check parameters
-    method <- match.arg(method)
     diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-    assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100,
-                            msg="For computation efficiency convert tumor table to percentage values.")
+    assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency convert tumor_table to percentage values.")
+
     tumor_table <- as.matrix(tumor_table)
     tumor_table <- round(tumor_table)
     storage.mode(tumor_table) <- "integer"
 
     assertthat::assert_that(nrow(tumor_table) == length(auc))
 
-    max_sites <- as.integer(max_sites)
-    if (method == "even") {
-        assertthat::assert_that(max_sites %% 2 == 0,
-                                msg="'method' is set to 'even' but 'max_sites' is not even")
-    }
+    assertthat::assert_that(is.numeric(max_sites))
 
-    hyper_range <- as.numeric(hyper_range)
-    hypo_range <- as.numeric(hypo_range)
+    assertthat::assert_that(is.numeric(hyper_range))
+    assertthat::assert_that(is.numeric(hypo_range))
+    assertthat::assert_that(is.numeric(percentiles))
+
     assertthat::assert_that(length(hyper_range) == 2)
     assertthat::assert_that(length(hypo_range) == 2)
-
-    percentiles <- as.integer(percentiles)
     assertthat::assert_that(length(percentiles) == 2)
-    assertthat::assert_that(percentiles[1] < percentiles[2], msg = "Min must be less than Max")
-    assertthat::assert_that(all(dplyr::between(percentiles, 0, 100)), msg = "Min and Max must be in the range 0-100")
 
-    message(sprintf("Selected method: %s", method))
-    message(sprintf("Selected number of regions to retrieve: %i", max_sites))
-    message(sprintf("Selected hyper-methylated regions range: %i-%i", hyper_range[1], hyper_range[2]))
-    message(sprintf("Selected hyper-methylated regions range: %i-%i", hypo_range[1], hypo_range[2]))
-    message(sprintf("Selected percentiles: %ith-%ith", percentiles[1], percentiles[2]))
+    assertthat::assert_that(all(dplyr::between(hyper_range, 0, 100)))
+    assertthat::assert_that(all(dplyr::between(hypo_range, 0, 100)))
+    assertthat::assert_that(all(dplyr::between(percentiles, 0, 100)))
 
-    # minimum and maximum beta per region ----------------------------------------
+    method <- match.arg(method)
+    if (method == "even")
+        assertthat::assert_that(max_sites %% 2 == 0, msg="method is set to 'even' but max_sites is not even")
+
+    assertthat::assert_that(is.logical(return_info))
+
+    message(sprintf("- Method: %s", method))
+    message(sprintf("- Number of regions to retrieve: %i", max_sites))
+    message(sprintf("- Hyper-methylated regions range: %i-%i", hyper_range[1], hyper_range[2]))
+    message(sprintf("- Hypo-methylated regions range: %i-%i", hypo_range[1], hypo_range[2]))
+    message(sprintf("- Percentiles: %ith-%ith", percentiles[1], percentiles[2]))
+
+    # minimum and maximum beta per region
+    message(sprintf("[%s] Evaluating sites...", Sys.time()))
     min_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[1]/100, na.rm = TRUE))
     max_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[2]/100, na.rm = TRUE))
 
@@ -74,38 +78,38 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
                                        AUC = auc,
                                        Max_beta = max_beta,
                                        Min_beta = min_beta) %>%
-    dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] ~ "Hyper",
-                                          AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  ~ "Hypo",
-                                          TRUE ~ "No_diff")) %>%
-    dplyr::filter(Type != "No_diff") %>%
-    dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
-    dplyr::arrange(-AUC)
+        dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] ~ "Hyper",
+                                              AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  ~ "Hypo",
+                                              TRUE ~ "No_diff")) %>%
+        dplyr::filter(Type != "No_diff") %>%
+        dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
+        dplyr::arrange(-AUC)
 
-regions_hyper <- dplyr::filter(diff_meth_regions, Type == "Hyper")
-regions_hypo <- dplyr::filter(diff_meth_regions, Type == "Hypo")
-message(sprintf("[%s] Total hyper-methylated regions retrieved = %i", Sys.time(), nrow(regions_hyper)))
-message(sprintf("[%s] Total hypo-methylated regions retrieved = %i", Sys.time(), nrow(regions_hypo)))
+    regions_hyper <- dplyr::filter(diff_meth_regions, Type == "Hyper")
+    regions_hypo <- dplyr::filter(diff_meth_regions, Type == "Hypo")
+    message(sprintf("* Total hyper-methylated regions = %i", nrow(regions_hyper)))
+    message(sprintf("* Total hypo-methylated regions = %i", nrow(regions_hypo)))
 
-if (method == "even") {
-    regions <- list(hyper = regions_hyper %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index),
-                    hypo  = regions_hypo  %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index))
-} else if (method == "top") {
-    top_regions <- dplyr::bind_rows(regions_hyper, regions_hypo) %>% dplyr::arrange(-AUC) %>% dplyr::slice(seq_len(max_sites))
-    regions <- list(hyper = top_regions %>% dplyr::filter(Type == "Hyper") %>% dplyr::pull(Index),
-                    hypo  = top_regions %>% dplyr::filter(Type == "Hypo")  %>% dplyr::pull(Index))
-} else if (method == "hyper") {
-    regions <- list(hyper = regions_hyper %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
-} else if (method == "hypo") {
-    regions <- list(hypo = regions_hypo %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
-}
+    if (method == "even") {
+        regions <- list(hyper = regions_hyper %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index),
+                        hypo  = regions_hypo  %>% dplyr::slice(seq_len(max_sites/2)) %>% dplyr::pull(Index))
+    } else if (method == "top") {
+        top_regions <- dplyr::bind_rows(regions_hyper, regions_hypo) %>% dplyr::arrange(-AUC) %>% dplyr::slice(seq_len(max_sites))
+        regions <- list(hyper = top_regions %>% dplyr::filter(Type == "Hyper") %>% dplyr::pull(Index),
+                        hypo  = top_regions %>% dplyr::filter(Type == "Hypo")  %>% dplyr::pull(Index))
+    } else if (method == "hyper") {
+        regions <- list(hyper = regions_hyper %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
+    } else if (method == "hypo") {
+        regions <- list(hypo = regions_hypo %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
+    }
 
-message(sprintf("[%s] Retrieved hyper-methylated regions = %i", Sys.time(), length(regions$hyper)))
-message(sprintf("[%s] Retrieved hypo-methylated regions = %i", Sys.time(), length(regions$hypo)))
+    message(sprintf("* Retrieved hyper-methylated regions = %i", length(regions$hyper)))
+    message(sprintf("* Retrieved hypo-methylated regions = %i", length(regions$hypo)))
 
-message(sprintf("[%s] Done", Sys.time()))
-if (return_info) {
-    return(list(regions, diff_meth_regions))
-} else {
-    return(regions)
-}
+    message(sprintf("[%s] Done", Sys.time()))
+    if (return_info) {
+        return(list(regions, diff_meth_regions))
+    } else {
+        return(regions)
+    }
 }

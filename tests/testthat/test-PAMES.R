@@ -7,18 +7,21 @@ test_that("'compute_AUC' errors and warnings", {
 test_that("'compute_AUC' works", {
   auc <- compute_AUC(tumor_toy_data, control_toy_data)
   expect_type(auc, "double")
+  # x <- matrix(NA, 10,10); x[,1:2] <- c(100,90)
+  # y <- matrix(NA, 10,10); y[,1:2] <- c(0,10)
+  # auc <- compute_AUC(x, y, 1, 1)
 })
 
 context("selection of sites") ##################################################
 test_that("'selection_of_sites' errors and warnings", {
-  expect_error(select_informative_sites(tumor_toy_data,
-    runif(nrow(tumor_toy_data)), platform="27", max_sites=19), "even")
+  auc <- runif(nrow(tumor_toy_data))
+  expect_error(select_informative_sites(tumor_toy_data, auc, max_sites = 19, platform="27"), "method is set to 'even'")
+  expect_error(select_informative_sites(tumor_toy_data, auc, percentiles = c(0,1000), platform="27"), "not true")
+  expect_error(select_informative_sites_ext(tumor_toy_data, control_toy_data, auc, platform=illumina27k_hg19), "not a numeric or integer vector")
 })
 test_that("'selection_of_sites' works", {
   set.seed(252)
   auc <- runif(nrow(tumor_toy_data))
-  expect_error(select_informative_sites(tumor_toy_data, auc, max_sites = 19, platform="27"), "'method' is set to 'even'")
-  expect_error(select_informative_sites(tumor_toy_data, auc, percentiles = c(0,1000), platform="27"), "range 0-100")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "even")
   expect_type(site_list, "list")
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", method = "top")
@@ -29,8 +32,10 @@ test_that("'selection_of_sites' works", {
   expect_length(site_list$hypo, 14)
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27", percentiles=c(5,95))
   expect_length(site_list$hyper, 10)
+  site_list <- select_informative_sites_ext(tumor_toy_data, control_toy_data, auc, platform=illumina27k_hg19[3:4], return_info = TRUE)
+  expect_length(site_list, 3)
+  expect_length(site_list$hypo, 10)
 })
-
 context("CpG regions") ##################################################
 test_that("median of regions", {
   x <- rbind(rep(NA, 10), sample(100, 10), sample(100, 10))
@@ -65,9 +70,7 @@ test_that("compute_purity works", {
   set.seed(252)
   auc <- runif(nrow(tumor_toy_data))
   site_list <- select_informative_sites(tumor_toy_data, auc, platform="27")
-  expect_error(compute_purity(tumor_toy_data*10, site_list, "27"), "Unexpected range")
-  purity <- compute_purity(tumor_toy_data, site_list, "27")
+  expect_error(compute_purity(tumor_toy_data*10, site_list, illumina27k_hg19[3:4]), "Unexpected range of beta")
+  purity <- compute_purity(tumor_toy_data, site_list, illumina27k_hg19[3:4])
   expect_length(purity, ncol(tumor_toy_data))
-  purity <- compute_purity(tumor_toy_data/100, site_list, "27")
-  expect_true(all(purity < 1))
 })

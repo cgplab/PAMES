@@ -1,3 +1,12 @@
+# PAMES v2.5.0
+- added new function (select_informative_sites_ext.R) that:
+  - considers also control data distribution
+  - use custom platform data (useful to filter out chromosomes X and Y)
+  - return named vectors (names are either derived from rownames of tumor_data 
+  or created with format "CpG_xxxxxxx")
+- compute_purity now requires platform data (not just "450k" or "27k")
+  addressing issue[#7](https://github.com/cgplab/PAMES/issues/7))
+
 # PAMES v2.4.0
 * deprecated parameter na_threshold in favor of min_sample_frac `compute_AUC` 
 * added simplify parameter: if false return a data.frame reporting fraction of NA samples per site

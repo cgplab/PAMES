@@ -28,16 +28,18 @@ compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold, simp
         min_samples_frac <- 1-na_threshold
     }
 
-    ncores <- min(max(as.integer(ncores), 1), parallel::detectCores())
-    assertthat::assert_that(is.numeric(min_samples_frac))
-    assertthat::assert_that(is.logical(simplify))
-    assertthat::assert_that(dplyr::between(min_samples_frac, 0, 1))
-    assertthat::assert_that(nrow(tumor_table) == nrow(control_table))
-
     diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
     diff_range_c <- diff(range(control_table, na.rm = TRUE))
     assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency, convert tumor table to percentage values.")
     assertthat::assert_that(diff_range_c > 1, diff_range_c <= 100, msg="For computation efficiency, convert control table to percentage values.")
+    assertthat::assert_that(nrow(tumor_table) == nrow(control_table))
+    if (!is.null(rownames(tumor_table)) & !is.null(rownames(tumor_table)))
+        warning("tumor_table and control_table have different rownames")
+
+    assertthat::assert_that(is.numeric(ncores))
+    ncores <- min(max(ncores, 1), parallel::detectCores())
+    assertthat::assert_that(is.numeric(min_samples_frac), dplyr::between(min_samples_frac, 0, 1))
+    assertthat::assert_that(is.logical(simplify))
 
     beta_table <- as.matrix(cbind(tumor_table, control_table))
     beta_table <- round(beta_table)
