@@ -20,7 +20,7 @@ compute_purity <- function(tumor_table, list_of_sites, platform) {
     assertthat::assert_that(any(c("hyper", "hypo") %in% names(list_of_sites)))
     diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
     assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="Unexpected range of beta values: convert tumor_table to percentage values.")
-    message(sprintf("> Using %i hyper- and %i hypo-methylated sites",
+    message(sprintf("- Using %i hyper- and %i hypo-methylated sites",
                     length(list_of_sites[["hyper"]]),
                     length(list_of_sites[["hypo"]])))
 

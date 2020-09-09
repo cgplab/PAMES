@@ -40,7 +40,7 @@
 select_informative_sites_ext <- function(tumor_table, control_table, auc, platform_data,
                                          max_sites = 20, min_distance = 1e6, percentiles = c(0, 100),
                                          hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
-                                         control_costraints = c(10,90),
+                                         control_costraints = c(20,80),
                                          method = c("even", "top", "hyper", "hypo"), return_info=FALSE){
 
     message(sprintf("[%s] # Select informative sites #", Sys.time()))
@@ -49,7 +49,6 @@ select_informative_sites_ext <- function(tumor_table, control_table, auc, platfo
     diff_range_c <- diff(range(control_table, na.rm = TRUE))
     assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency convert tumor_table to percentage values.")
     assertthat::assert_that(diff_range_c > 1, diff_range_c <= 100, msg="For computation efficiency convert control_table to percentage values.")
-
 
     tumor_table <- as.matrix(tumor_table)
     tumor_table <- round(tumor_table)
@@ -99,16 +98,18 @@ select_informative_sites_ext <- function(tumor_table, control_table, auc, platfo
     message(sprintf("- Percentiles: %ith-%ith", percentiles[1], percentiles[2]))
 
     # minimum and maximum beta per site
-    message(sprintf("[%s] Evaluating sites...", Sys.time()))
+    message(sprintf("[%s] Compute min-/max- beta scores...", Sys.time()))
     min_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[1]/100, na.rm = TRUE))
     max_beta <- suppressWarnings(apply(tumor_table, 1, quantile, probs = percentiles[2]/100, na.rm = TRUE))
 
+    message(sprintf("[%s] Compute control interquartiles...", Sys.time()))
     lower_quart <- suppressWarnings(apply(control_table, 1, quantile, probs = .25, na.rm = TRUE))
     upper_quart <- suppressWarnings(apply(control_table, 1, quantile, probs = .75, na.rm = TRUE))
 
     if (is.null(names(auc)))
         names(auc) <- sprintf("CpG_%06d", seq_along(auc))
 
+    message(sprintf("[%s] Select sites...", Sys.time()))
     diff_meth_sites <- dplyr::tibble(Probe = names(auc),
                                      Index = seq_along(auc),
                                      AUC = auc,
@@ -117,15 +118,16 @@ select_informative_sites_ext <- function(tumor_table, control_table, auc, platfo
                                      Lower_Quart = lower_quart,
                                      Upper_Quart = upper_quart,
                                      Chromosome = platform_data[[1]],
-                                     Position = platform_data[[2]]) %>%
-        dplyr::mutate(Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] & Upper_Quart < control_costraints[1] ~ "Hyper",
-                                              AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  & Lower_Quart > control_costraints[2] ~ "Hypo",
-                                              TRUE ~ "No_diff")) %>%
-        dplyr::mutate(AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC)) %>%
-        dplyr::arrange(-AUC)
+                                     Position = platform_data[[2]])
+    diff_meth_sites <- dplyr::mutate(diff_meth_sites,
+        Type = dplyr::case_when(AUC > .80 & Min_beta < hyper_range[1] & Max_beta > hyper_range[2] & Upper_Quart < control_costraints[1] ~ "Hyper",
+                                AUC < .20 & Min_beta < hypo_range[1]  & Max_beta > hypo_range[2]  & Lower_Quart > control_costraints[2] ~ "Hypo",
+                                TRUE ~ "No_diff"))
+    diff_meth_sites <- dplyr::mutate(diff_meth_sites, AUC = dplyr::if_else(Type == "Hypo", 1-AUC, AUC))
+    diff_meth_sites <- dplyr::arrange(diff_meth_sites, -AUC)
 
     sites_hyper <- dplyr::filter(diff_meth_sites, Type == "Hyper")
-    sites_hypo <- dplyr::filter(diff_meth_sites, Type == "Hypo")
+    sites_hypo  <- dplyr::filter(diff_meth_sites, Type == "Hypo")
     message(sprintf("* Total hyper-methylated sites = %i", nrow(sites_hyper)))
     message(sprintf("* Total hypo-methylated sites = %i", nrow(sites_hypo)))
 
@@ -142,9 +144,10 @@ select_informative_sites_ext <- function(tumor_table, control_table, auc, platfo
         i <- i + 1
     }
     while (kept_sites < max_sites & i <= nrow(sites_hyper)){
-        keep_it <- all(diff_chr[i, seq_len(i-1)] | above_distance[i, seq_len(i-1)])
-        if (isTRUE(keep_it)) {
-            keep_site_hyper[i] <- keep_it
+        check_all <- all(diff_chr[i, seq_len(i-1)] | above_distance[i, seq_len(i-1)])
+        check_all <- check_all[!is.na(check_all)]
+        if (length(check_all) > 0 & isTRUE(all(check_all))) {
+            keep_site_hyper[i] <- TRUE
             kept_sites <- kept_sites + 1
         }
         i <- i + 1
@@ -163,9 +166,9 @@ select_informative_sites_ext <- function(tumor_table, control_table, auc, platfo
         i <- i + 1
     }
     while (kept_sites < max_sites & i <= nrow(sites_hypo)){
-        keep_it <- all(diff_chr[i, seq_len(i-1)] | above_distance[i, seq_len(i-1)])
-        if (isTRUE(keep_it)) {
-            keep_site_hypo[i] <- keep_it
+        check_all <- all(diff_chr[i, seq_len(i-1)] | above_distance[i, seq_len(i-1)])
+        if (isTRUE(check_all)) {
+            keep_site_hypo[i] <- TRUE
             kept_sites <- kept_sites + 1
         }
         i <- i + 1
