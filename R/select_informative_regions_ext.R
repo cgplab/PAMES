@@ -123,6 +123,8 @@ select_informative_regions_ext <- function(tumor_table, control_table, auc,
         regions <- list(hypo = regions_hypo %>% dplyr::slice(seq_len(max_sites)) %>% dplyr::pull(Index))
     }
 
+    names(sites$hyper) <-  names(auc)[sites$hyper]
+    names(sites$hypo)  <-  names(auc)[sites$hypo]
     message(sprintf("* Retrieved hyper-methylated regions = %i", length(regions$hyper)))
     message(sprintf("* Retrieved hypo-methylated regions = %i", length(regions$hypo)))
 
