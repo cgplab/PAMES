@@ -17,7 +17,7 @@ library(devtools)
 # use_data(illumina27k_hg38, overwrite=T)
 # use_data(illumina450k_hg38, overwrite=T)
 
-load("../data/cpg_islands_df.rda")
+load("../data/cpg_islands.rda")
 N <- 1000 # first N islands
 bs_tumor_toy_matrix <- c()
 bs_control_toy_matrix <- c()
@@ -47,7 +47,7 @@ for (i in seq_len(N)){
   cpg_sites <- c(cpg_sites, pos)
 }
 
-bs_toy_sites <- tibble(chr = "chr1", pos = cpg_sites)
+bs_toy_sites <- tibble(chr = "1", pos = cpg_sites)
 dimnames(bs_tumor_toy_matrix) <- list(paste0("chr1_", cpg_sites), paste0("tumor", seq_len(nsamples)))
 dimnames(bs_control_toy_matrix) <- list(paste0("chr1_", cpg_sites), paste0("control", seq_len(nsamples)))
 bs_toy_matrix <- round(cbind(bs_tumor_toy_matrix, bs_control_toy_matrix)*100)

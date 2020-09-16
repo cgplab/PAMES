@@ -19,7 +19,7 @@
 #' auc_data <- compute_AUC(tumor_toy_table, control_toy_table)
 #' @importFrom stats setNames
 #' @export
-compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold, return_info=TRUE, min_samples_frac=1) {
+compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold, return_info=FALSE, min_samples_frac=1) {
     message(sprintf("[%s] # Compute AUC #", Sys.time()))
     # check parameters
     if (!missing(na_threshold)){
@@ -52,7 +52,7 @@ compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold, retu
     is_tumor <- c(rep(TRUE, ncol(tumor_table)), rep(FALSE, ncol(control_table)))
 
     cl <- parallel::makeCluster(ncores)
-    if (isTRUE(return_info)){
+    if (isFALSE(return_info)){
         # select rows by NAs
         message(sprintf("[%s] Filter sites with fraction of available beta-scores greater than or equal to %.2f...", Sys.time(), min_samples_frac))
         tumor_available_sites <- which(rowSums(!is.na(beta_table[,is_tumor]))/sum(is_tumor) >= min_samples_frac)

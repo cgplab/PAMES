@@ -3,7 +3,6 @@
 \docType{package}
 \name{PAMES}
 \alias{PAMES}
-\alias{PAMES-package}
 \title{PAMES: Purity Assessment from clonal MEthylation Sites}
 \description{
 The PAMES package provides a set of functions to estimate

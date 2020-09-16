@@ -4,7 +4,9 @@
 \name{illumina450k_hg38}
 \alias{illumina450k_hg38}
 \title{Illumina 450k BeadChip mapped to Genome Reference hg38}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 482421 rows and 10 columns.}
+\format{
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 482421 rows and 10 columns.
+}
 \source{
 \url{https://support.illumina.com/array/array_kits/infinium_humanmethylation27_beadchip_kit.html.html}
 }

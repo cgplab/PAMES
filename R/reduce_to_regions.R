@@ -42,14 +42,20 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
                                                                       names = cpg_regions[[4]]))
     sites_range <- GenomicRanges::GRanges(cpg_sites[[1]], ranges = IRanges::IRanges(start=cpg_sites[[2]], width=1))
     overlaps <- GenomicRanges::findOverlaps(regions_range, sites_range)
+    if (length(overlaps) == 0){
+        message(sprintf("[%s] No overlaps found",  Sys.time()))
+        return(NULL)
+    }
 
-    message(sprintf("[%s] Reducing beta values...",  Sys.time())) #
+    message(sprintf("[%s] Reducing beta values...",  Sys.time()))
     reduced_table <- matrix(NA, length(regions_range), ncol(beta_table),
                             dimnames = list(names(regions_range), colnames(beta_table)))
     # insert reduced beta values at appropriate positions (leave uncovered regions to NA)
-    reduced_table[unique(S4Vectors::from(overlaps)),] <- do.call(rbind,
-                                                                 tapply(S4Vectors::to(overlaps), S4Vectors::from(overlaps),
-                                                                        function(idx) {median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)}))
+
+    reduced_table[unique(S4Vectors::queryHits(overlaps)),] <-
+        do.call(rbind,
+                tapply(S4Vectors::subjectHits(overlaps), S4Vectors::queryHits(overlaps),
+                       function(idx) {median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)}))
 
     message(sprintf("[%s] Done",  Sys.time()))
     return(reduced_table)
@@ -67,7 +73,7 @@ median_of_region <- function(x, n) {
     valid_sites <- which(!rowSums(is.na(x)) == ncol(x))
     x <- x[valid_sites, , drop=FALSE]
     if (nrow(x) < n) {
-        return(NA)
+        return(rep(NA, ncol(x)))
     } else {
         return(apply(x, 2, median, na.rm = TRUE))
     }

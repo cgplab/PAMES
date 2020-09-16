@@ -4,8 +4,14 @@
 \alias{compute_AUC}
 \title{Compute Area Under Curve for a matrix of samples}
 \usage{
-compute_AUC(tumor_table, control_table, ncores = 1, na_threshold,
-  return_info = TRUE, min_samples_frac = 1)
+compute_AUC(
+  tumor_table,
+  control_table,
+  ncores = 1,
+  na_threshold,
+  return_info = FALSE,
+  min_samples_frac = 1
+)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}

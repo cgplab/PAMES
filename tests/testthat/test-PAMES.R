@@ -7,9 +7,8 @@ test_that("'compute_AUC' errors and warnings", {
 test_that("'compute_AUC' works", {
   auc <- compute_AUC(tumor_toy_data, control_toy_data)
   expect_type(auc, "double")
-  # x <- matrix(NA, 10,10); x[,1:2] <- c(100,90)
-  # y <- matrix(NA, 10,10); y[,1:2] <- c(0,10)
-  # auc <- compute_AUC(x, y, 1, 1)
+  auc <- compute_AUC(tumor_toy_data, control_toy_data, return_info=TRUE)
+  expect_type(auc, "list")
 })
 
 context("selection of sites") ##################################################
@@ -41,35 +40,37 @@ test_that("median of regions", {
   x <- rbind(rep(NA, 10), sample(100, 10), sample(100, 10))
   x[,3] <- NA
   expect_type(median_of_region(x, 2), "double")
-  expect_true(is.na(median_of_region(x, 3)))
+  expect_true(all(is.na(median_of_region(x, 3))))
 })
 test_that("reduce_to_regions works", {
-  expect_error(reduce_to_regions(tumor_toy_data, illumina27k_hg19, cpg_islands), "No shared chromosomes")
+  expect_error(reduce_to_regions(tumor_toy_data, illumina27k_hg38[3:4], cpg_islands), "No shared chromosomes")
   reduced_data <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands)
   expect_is(reduced_data, "matrix")
   expect_equal(nrow(reduced_data), nrow(cpg_islands))
 })
 test_that("select_informative_regions works", {
   reduced_data <- round(reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands))
-  set.seed(252)
-  auc <- runif(nrow(reduced_data))
-  # auc <- compute_AUC(reduced_tumor, reduced_control)
-  region_list <- select_informative_regions(reduced_data, auc)
-  expect_type(region_list, "list")
-  region_list <- select_informative_regions(reduced_data, auc, method="top")
-  expect_type(region_list, "list")
-  region_list <- select_informative_regions(reduced_data, auc, method="hyper")
-  # expect_length(region_list$hyper, 20)
-  expect_type(region_list, "list")
-  region_list <- select_informative_regions(reduced_data, auc, method="hypo")
-  # expect_length(region_list$hypo, 20)
-  expect_type(region_list, "list")
-  region_list <- select_informative_regions(reduced_data, auc, percentiles=c(5,95))
-  # expect_length(region_list$hypo, 10)
-  expect_type(region_list, "list")
   reduced_tumor <- reduced_data[,1:10]
   reduced_control <- reduced_data[,11:20]
-  region_list <- select_informative_regions_ext(reduced_tumor, reduced_control, auc, percentiles=c(5,95))
+  set.seed(252)
+  auc_bs <- runif(nrow(reduced_data))
+  region_list <- select_informative_regions(reduced_data, auc_bs)
+  expect_type(region_list, "list")
+  region_list <- select_informative_regions(reduced_data, auc_bs, method="top")
+  expect_type(region_list, "list")
+  region_list <- select_informative_regions(reduced_data, auc_bs, method="hyper")
+  # expect_length(region_list$hyper, 20)
+  expect_type(region_list, "list")
+  region_list <- select_informative_regions(reduced_data, auc_bs, method="hypo")
+  # expect_length(region_list$hypo, 20)
+  expect_type(region_list, "list")
+  region_list <- select_informative_regions(reduced_data, auc_bs, percentiles=c(5,95))
+  # expect_length(region_list$hypo, 10)
+  expect_type(region_list, "list")
+  region_list <- select_informative_regions_ext(reduced_tumor, reduced_control,
+                                                auc_bs, hyper_range = c(90,90),
+                                                hypo_range = c(10,10),
+                                                control_costraints = c(100,0), return_info = FALSE)
   # expect_length(region_list$hypo, 10)
   expect_type(region_list, "list")
 })

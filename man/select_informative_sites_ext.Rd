@@ -4,11 +4,20 @@
 \alias{select_informative_sites_ext}
 \title{Select informative CpG sites (extended)}
 \usage{
-select_informative_sites_ext(tumor_table, control_table, auc,
-  platform_data, max_sites = 20, min_distance = 1000000,
-  percentiles = c(0, 100), hyper_range = c(min = 40, max = 90),
-  hypo_range = c(min = 10, max = 60), control_costraints = c(20, 80),
-  method = c("even", "top", "hyper", "hypo"), return_info = FALSE)
+select_informative_sites_ext(
+  tumor_table,
+  control_table,
+  auc,
+  platform_data,
+  max_sites = 20,
+  min_distance = 1000000,
+  percentiles = c(0, 100),
+  hyper_range = c(min = 40, max = 90),
+  hypo_range = c(min = 10, max = 60),
+  control_costraints = c(20, 80),
+  method = c("even", "top", "hyper", "hypo"),
+  return_info = FALSE
+)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}

@@ -4,7 +4,9 @@
 \name{illumina27k_hg19}
 \alias{illumina27k_hg19}
 \title{Illumina 27k BeadChip mapped to Genome Reference hg19}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 27578 rows and 4 columns.}
+\format{
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 27578 rows and 4 columns.
+}
 \source{
 \url{https://support.illumina.com/array/array_kits/infinium_humanmethylation27_beadchip_kit.html.html}
 }

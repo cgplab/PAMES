@@ -4,7 +4,9 @@
 \name{bs_toy_matrix}
 \alias{bs_toy_matrix}
 \title{BS Toy data}
-\format{An object of class \code{matrix} with 4510 rows and 20 columns.}
+\format{
+An object of class \code{matrix} with 4510 rows and 20 columns.
+}
 \usage{
 bs_toy_matrix
 }

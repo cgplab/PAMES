@@ -4,10 +4,16 @@
 \alias{select_informative_regions}
 \title{Select informative regions}
 \usage{
-select_informative_regions(tumor_table, auc, max_sites = 20,
-  hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max =
-  60), method = c("even", "top", "hyper", "hypo"), percentiles = c(0,
-  100), return_info = FALSE)
+select_informative_regions(
+  tumor_table,
+  auc,
+  max_sites = 20,
+  hyper_range = c(min = 40, max = 90),
+  hypo_range = c(min = 10, max = 60),
+  method = c("even", "top", "hyper", "hypo"),
+  percentiles = c(0, 100),
+  return_info = FALSE
+)
 }
 \arguments{
 \item{tumor_table}{A matrix of beta-values (percentage) from tumor samples.}
