@@ -95,7 +95,7 @@ select_informative_sites_ext <- function(tumor_table, control_table, auc, platfo
     message(sprintf("- Hyper-methylated sites range: %i-%i", hyper_range[1], hyper_range[2]))
     message(sprintf("- Hypo-methylated sites range: %i-%i", hypo_range[1], hypo_range[2]))
     message(sprintf("- Control constraints: %i-%i", control_costraints[1], control_costraints[2]))
-    message(sprintf("- Percentiles: %ith-%ith", percentiles[1], percentiles[2]))
+    message(sprintf("- Percentiles: %g-%g", percentiles[1], percentiles[2]))
 
     # minimum and maximum beta per site
     message(sprintf("[%s] Compute min-/max- beta scores...", Sys.time()))

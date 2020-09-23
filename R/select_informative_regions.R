@@ -67,7 +67,7 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
     message(sprintf("- Number of regions to retrieve: %i", max_sites))
     message(sprintf("- Hyper-methylated regions range: %i-%i", hyper_range[1], hyper_range[2]))
     message(sprintf("- Hypo-methylated regions range: %i-%i", hypo_range[1], hypo_range[2]))
-    message(sprintf("- Percentiles: %ith-%ith", percentiles[1], percentiles[2]))
+    message(sprintf("- Percentiles: %g-%g", percentiles[1], percentiles[2]))
 
     # minimum and maximum beta per region
     message(sprintf("[%s] Compute min-/max- beta scores...", Sys.time()))
