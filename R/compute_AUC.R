@@ -8,15 +8,15 @@
 #' @param control_table A matrix of beta-values (percentage) from normal/control samples.
 #' @param ncores Number of parallel processes to use for parallel computing.
 #' @param min_samples_frac Fraction of samples (independently in tumor and
-#' control samples) that are not NA required to analyze a site (default=100).
+#' control samples) that are not NA required to analyze a site (range=0-1, default=1).
 #' @param return_info If TRUE (default) return a vector else compute all AUC and return a data.frame
 #' reporting fraction of NAs in tumor and control tables.
 #' @param na_threshold (DEPRECATED) Fraction of NAs (considered independently in tumor and
 #' control samples) above which a site will not be selected (default=0).
 #' @return A vector of AUC scores (NA if not analyzed) or a data.frame with AUC scores
-#' and the fraction of non-NA samples in tumor and contol tables.
+#' and the fraction of non-NA samples in tumor and control tables.
 #' @examples
-#' auc_data <- compute_AUC(tumor_toy_table, control_toy_table)
+#' auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
 #' @importFrom stats setNames
 #' @export
 compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold, return_info=FALSE, min_samples_frac=1) {
@@ -29,10 +29,6 @@ compute_AUC <- function(tumor_table, control_table, ncores=1, na_threshold, retu
         min_samples_frac <- 1-na_threshold
     }
 
-    diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-    diff_range_c <- diff(range(control_table, na.rm = TRUE))
-    assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency, convert tumor table to percentage values.")
-    assertthat::assert_that(diff_range_c > 1, diff_range_c <= 100, msg="For computation efficiency, convert control table to percentage values.")
     assertthat::assert_that(nrow(tumor_table) == nrow(control_table))
     if (!is.null(rownames(tumor_table)) & !is.null(rownames(control_table))){
         if (any(rownames(tumor_table) != rownames(control_table))){

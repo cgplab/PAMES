@@ -3,9 +3,13 @@
 #' This function generates a list of informative regions to be used to estimate
 #' the purity of a set of tumor samples.
 #'
-#' Informative regions are divided into \code{hyper} and \code{hypo} depending
-#' on their level of methylation with respect to the average beta-score of
-#' normal samples. Both sets will be used to compute purity.
+#' The EXTENDED version was added to introduce the new parameter, named
+#' \code{control_costraints}, to force selection of sites where upper/lower
+#' quartiles of control scores are below beta-values given by
+#' \code{control_costraints}.  Informative regions are divided into
+#' \code{hyper} and \code{hypo} depending on their level of methylation with
+#' respect to the average beta-score of normal samples. Both sets will be used
+#' to compute purity.
 #'
 #' @param tumor_table A matrix of beta-values (percentage) from tumor samples.
 #' @param control_table A matrix of beta-values (percentage) from normal/control samples.
@@ -22,6 +26,8 @@
 #' @param percentiles Vector of length 2: lower and upper percentiles to
 #' select sites with beta values outside hypo- and hyper-ranges (default =
 #' 0,100; 0th and 100th percentiles, i.e. only min and max beta should be outside of ranges).
+#' @param control_costraints To select a site, "first quartile"/"third quartile" of control data must be above/below these beta-values.
+#' @param return_info Return also a data.frame of all informative sites (for debug purpose).
 #' @return A named list of indexes of informative regions ("hyper-" and "hypo-methylated").
 #' @importFrom dplyr "%>%"
 #' @export
@@ -32,7 +38,7 @@
 select_informative_regions_ext <- function(tumor_table, control_table, auc,
                                        max_sites = 20, percentiles = c(0,100),
                                        hyper_range = c(min = 40, max = 90), hypo_range = c(min = 10, max = 60),
-                                       control_costraints = c(20,80),
+                                       control_costraints = c(30,70),
                                        method = c("even", "top", "hyper", "hypo"), return_info=FALSE){
 
     message(sprintf("[%s] # Select informative regions #", Sys.time()))

@@ -1,3 +1,5 @@
+# PAMES v2.7.0
+- renamed parameter `platform` to `ref_table`
 # PAMES v2.5.0
 - added new function (select_informative_sites_ext.R) that:
   - considers also control data distribution
@@ -31,7 +33,7 @@
 * Fix bug: "top" method retrieved same sites of "hyper"
 
 # PAMES v2.1.0
-* Faster and simplier cluster reduction in `select_informative_sites`
+* Faster and simpler cluster reduction in `select_informative_sites`
 * Removed internal functions:
     - `is_too_close`
     - `cluster_reduction`

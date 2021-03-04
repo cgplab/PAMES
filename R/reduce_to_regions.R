@@ -25,9 +25,6 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
     assertthat::assert_that(ncol(cpg_regions) >= 3)
     assertthat::assert_that(length(intersect(cpg_regions[[1]], cpg_sites[[1]])) > 0,
                             msg="No shared chromosomes between cpg_sites and cpg_regions. Check chromosome names.")
-    diff_range <- diff(range(beta_table, na.rm = TRUE))
-    assertthat::assert_that(diff_range > 1, diff_range <= 100,
-                            msg=paste("For computation efficiency convert table to percentage values."))
     beta_table <- round(as.matrix(beta_table))
     storage.mode(beta_table) <- "integer"
 
@@ -52,10 +49,25 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
                             dimnames = list(names(regions_range), colnames(beta_table)))
     # insert reduced beta values at appropriate positions (leave uncovered regions to NA)
 
-    reduced_table[unique(S4Vectors::queryHits(overlaps)),] <-
-        do.call(rbind,
-                tapply(S4Vectors::subjectHits(overlaps), S4Vectors::queryHits(overlaps),
-                       function(idx) {median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)}))
+    subject_hits <- S4Vectors::subjectHits(overlaps)
+    query_hits <- S4Vectors::queryHits(overlaps)
+    idx_list <- tapply(subject_hits, query_hits, function(idx) return(idx))
+    above_thr_regions <- which(sapply(idx_list, length) >= min_CpGs) # skip regions with not enough sites
+
+    if (length(above_thr_regions) == 0){
+        message(sprintf("[%s] No region overlaps enough sites",  Sys.time()))
+        return(reduced_table)
+    }
+
+    pb <- utils::txtProgressBar(max=length(idx_list), style=3, width=80)
+    reduced_data <- lapply(seq_along(idx_list[above_thr_regions]), function(i) {
+            utils::setTxtProgressBar(pb, i)
+            idx <- idx_list[[i]]
+            median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)
+    })
+    close(pb)
+
+    reduced_table[unique(query_hits)[above_thr_regions],] <- do.call(rbind, reduced_data)
 
     message(sprintf("[%s] Done",  Sys.time()))
     return(reduced_table)
@@ -70,8 +82,8 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
 #' @keywords internal
 median_of_region <- function(x, n) {
     # remove sites non reported for all samples
-    valid_sites <- which(!rowSums(is.na(x)) == ncol(x))
-    x <- x[valid_sites, , drop=FALSE]
+    valid_sites <- which(rowSums(is.na(x)) != ncol(x))
+    x <- x[valid_sites,,drop=FALSE]
     if (nrow(x) < n) {
         return(rep(NA, ncol(x)))
     } else {

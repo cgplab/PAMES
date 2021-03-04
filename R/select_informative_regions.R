@@ -21,6 +21,7 @@
 #' @param percentiles Vector of length 2: lower and upper percentiles to
 #' select sites with beta values outside hypo- and hyper-ranges (default =
 #' 0,100; 0th and 100th percentiles, i.e. only min and max beta should be outside of ranges).
+#' @param return_info Return also a data.frame of all informative sites (for debug purpose).
 #' @return A named list of indexes of informative regions ("hyper-" and "hypo-methylated").
 #' @importFrom dplyr "%>%"
 #' @export
@@ -34,8 +35,6 @@ select_informative_regions <- function(tumor_table, auc, max_sites = 20,
 
     message(sprintf("[%s] # Select informative regions #", Sys.time()))
     # check parameters
-    diff_range_t <- diff(range(tumor_table, na.rm = TRUE))
-    assertthat::assert_that(diff_range_t > 1, diff_range_t <= 100, msg="For computation efficiency convert tumor_table to percentage values.")
 
     tumor_table <- as.matrix(tumor_table)
     tumor_table <- round(tumor_table)

@@ -4,7 +4,7 @@
 #' the level of purity of tumor samples.
 #'
 #' The basic workflow of PAMES requires to \code{\link{compute_AUC}} (to evaluate tumor-control methylation differences),
-#' \code{\link{select_informative_sites}} (to retreive sites of interest),
+#' \code{\link{select_informative_sites}} (to retrieve sites of interest),
 #' and \code{\link{compute_purity}} of tumor samples.
 #' When working with methylation data obtained with other technologies (such as Bisulphite Sequencing),
 #' users should must map their set of CpG sites to differentially methylated regions

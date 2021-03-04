@@ -12,7 +12,7 @@ select_informative_regions_ext(
   percentiles = c(0, 100),
   hyper_range = c(min = 40, max = 90),
   hypo_range = c(min = 10, max = 60),
-  control_costraints = c(20, 80),
+  control_costraints = c(30, 70),
   method = c("even", "top", "hyper", "hypo"),
   return_info = FALSE
 )
@@ -37,9 +37,13 @@ required to select hyper-methylated informative sites.}
 \item{hypo_range}{A vector of length 2 with minimum lower and upper values
 required to select hypo-methylated informative sites.}
 
+\item{control_costraints}{To select a site, "first quartile"/"third quartile" of control data must be above/below these beta-values.}
+
 \item{method}{How to select sites: "even" (half hyper-, half hypo-methylated sites),
 "top" (highest AUC irregardless of hyper or hypomethylation), "hyper" (hyper-methylated sites only),
 "hypo" (hypo-methylated, sites only).}
+
+\item{return_info}{Return also a data.frame of all informative sites (for debug purpose).}
 }
 \value{
 A named list of indexes of informative regions ("hyper-" and "hypo-methylated").
@@ -49,9 +53,13 @@ This function generates a list of informative regions to be used to estimate
 the purity of a set of tumor samples.
 }
 \details{
-Informative regions are divided into \code{hyper} and \code{hypo} depending
-on their level of methylation with respect to the average beta-score of
-normal samples. Both sets will be used to compute purity.
+The EXTENDED version was added to introduce the new parameter, named
+\code{control_costraints}, to force selection of sites where upper/lower
+quartiles of control scores are below beta-values given by
+\code{control_costraints}.  Informative regions are divided into
+\code{hyper} and \code{hypo} depending on their level of methylation with
+respect to the average beta-score of normal samples. Both sets will be used
+to compute purity.
 }
 \examples{
 reduced_data <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands[1:1000,])

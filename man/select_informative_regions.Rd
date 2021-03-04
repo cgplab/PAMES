@@ -36,6 +36,8 @@ required to select hypo-methylated informative sites.}
 \item{percentiles}{Vector of length 2: lower and upper percentiles to
 select sites with beta values outside hypo- and hyper-ranges (default =
 0,100; 0th and 100th percentiles, i.e. only min and max beta should be outside of ranges).}
+
+\item{return_info}{Return also a data.frame of all informative sites (for debug purpose).}
 }
 \value{
 A named list of indexes of informative regions ("hyper-" and "hypo-methylated").

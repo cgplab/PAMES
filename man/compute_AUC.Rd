@@ -27,11 +27,11 @@ control samples) above which a site will not be selected (default=0).}
 reporting fraction of NAs in tumor and control tables.}
 
 \item{min_samples_frac}{Fraction of samples (independently in tumor and
-control samples) that are not NA required to analyze a site (default=100).}
+control samples) that are not NA required to analyze a site (range=0-1, default=1).}
 }
 \value{
 A vector of AUC scores (NA if not analyzed) or a data.frame with AUC scores
-and the fraction of non-NA samples in tumor and contol tables.
+and the fraction of non-NA samples in tumor and control tables.
 }
 \description{
 This function computes the Area Under Curve used to define the segregation
@@ -39,5 +39,5 @@ between tumor and control samples accordingly to their methylation (beta)
 values.
 }
 \examples{
-auc_data <- compute_AUC(tumor_toy_table, control_toy_table)
+auc_data <- compute_AUC(tumor_toy_data, control_toy_data)
 }
