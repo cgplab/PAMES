@@ -136,7 +136,7 @@ select_informative_regions_ext <- function(tumor_table, control_table, auc,
 
     message(sprintf("[%s] Done", Sys.time()))
     if (return_info) {
-        return(list(regions, diff_meth_regions))
+        return(c(regions, list(info=diff_meth_regions)))
     } else {
         return(regions)
     }

@@ -1,3 +1,5 @@
+# PAMES v2.7.1
+- fix `select_informative_regions_ext` with flag `return_info=TRUE`
 # PAMES v2.7.0
 - renamed parameter `platform` to `ref_table`
 # PAMES v2.5.0
