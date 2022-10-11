@@ -11,14 +11,17 @@
 #' @param min_CpGs An integer (default to 3). Minimum number of CpG sites
 #' within a single genomic region required to compute the reduced beta value
 #' (return NA otherwise).
+#' @param method Take `median` or `mean`of CpG sites.
 #' @return A matrix of beta values (nrow == length(cpg_indexes)).
 #' @importFrom stats median
 #' @export
 #' @examples
 #' reduced_data <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands[1:10,])
-reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
+reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3, method=c("median", "mean")){
+
     message(sprintf("[%s] # Reduce to regions #", Sys.time()))
     # check parameters
+    method <- match.arg(method)
     min_CpGs <- as.integer(min_CpGs)
     assertthat::assert_that(min_CpGs > 0)
     assertthat::assert_that(ncol(cpg_sites) >= 2)
@@ -63,7 +66,7 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
     reduced_data <- lapply(seq_along(idx_list[above_thr_regions]), function(i) {
             utils::setTxtProgressBar(pb, i)
             idx <- idx_list[[i]]
-            median_of_region(beta_table[idx,,drop = FALSE], min_CpGs)
+            summarise_region(beta_table[idx,,drop = FALSE], min_CpGs, method)
     })
     close(pb)
 
@@ -73,20 +76,23 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3){
     return(reduced_table)
 }
 
-#' Transform CpG sites to one CpG region
+#' Reduce many CpG sites to one CpG region
 #'
-#' If the number of sites is sufficient take the median value else return NA.
+#' If the number of sites is sufficient, take the median/mean value else return NA.
 #' @param x A subset matrix.
 #' @param n Minimum required number of sites per region (return NA otherwise).
+#' @param method Either `median` or `mean`.
 #' @return A vector
 #' @keywords internal
-median_of_region <- function(x, n) {
-    # remove sites non reported for all samples
+summarise_region <- function(x, n, method) {
+    # remove fully NA sites
     valid_sites <- which(rowSums(is.na(x)) != ncol(x))
     x <- x[valid_sites,,drop=FALSE]
     if (nrow(x) < n) {
         return(rep(NA, ncol(x)))
-    } else {
+    } else if (method=="median"){
         return(apply(x, 2, median, na.rm = TRUE))
+    } else if (method=="mean"){
+        return(apply(x, 2, mean, na.rm = TRUE))
     }
 }

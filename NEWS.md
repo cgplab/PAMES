@@ -1,3 +1,6 @@
+# PAMES v2.7.2
+- rename `median_of_regions`: `reduce_region`
+- add `method` parameter to `reduce_to_regions`: allow choice between "median" (default) or mean
 # PAMES v2.7.1
 - fix `select_informative_regions_ext` with flag `return_info=TRUE`
 # PAMES v2.7.0

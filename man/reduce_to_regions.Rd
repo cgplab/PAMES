@@ -4,7 +4,13 @@
 \alias{reduce_to_regions}
 \title{Reduce beta values from CpG sites to genomic regions}
 \usage{
-reduce_to_regions(beta_table, cpg_sites, cpg_regions, min_CpGs = 3)
+reduce_to_regions(
+  beta_table,
+  cpg_sites,
+  cpg_regions,
+  min_CpGs = 3,
+  method = c("median", "mean")
+)
 }
 \arguments{
 \item{beta_table}{A matrix of beta-values (percentage).}
@@ -16,6 +22,8 @@ reduce_to_regions(beta_table, cpg_sites, cpg_regions, min_CpGs = 3)
 \item{min_CpGs}{An integer (default to 3). Minimum number of CpG sites
 within a single genomic region required to compute the reduced beta value
 (return NA otherwise).}
+
+\item{method}{Take `median` or `mean`of CpG sites.}
 }
 \value{
 A matrix of beta values (nrow == length(cpg_indexes)).
