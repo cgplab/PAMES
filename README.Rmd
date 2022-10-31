@@ -18,14 +18,14 @@ Purity Assessment from DNA MEthylation Sites
 
 ## Installation
 
-You can install PAMES from github with:
-
+You can install PAMES version 3 (aka PAMES2) with:
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("cgplab/PAMES")
 ```
-To include vignette use:
-```{r eval = FALSE}
+
+To install a previous version of PAMES use:
+```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("cgplab/PAMES", build_vignettes = T)
+devtools::install_github("cgplab/PAMES", ref='v2.7.2')
 ```

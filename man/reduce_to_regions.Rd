@@ -13,27 +13,26 @@ reduce_to_regions(
 )
 }
 \arguments{
-\item{beta_table}{A matrix of beta-values (percentage).}
+\item{beta_table}{A matrix of beta-values.}
 
 \item{cpg_sites}{A data.frame reporting the genomic location of CpG sites.}
 
 \item{cpg_regions}{A data.frame reporting the genomic location of genomic regions.}
 
-\item{min_CpGs}{An integer (default to 3). Minimum number of CpG sites
-within a single genomic region required to compute the reduced beta value
-(return NA otherwise).}
+\item{min_CpGs}{An integer (default=3). Minimum number of CpG sites
+within a single genomic region (return NA otherwise).}
 
-\item{method}{Take `median` or `mean`of CpG sites.}
+\item{method}{Function to summarise a region: either `median` or `mean` (default=median).}
 }
 \value{
-A matrix of beta values (nrow == length(cpg_indexes)).
+A matrix of beta values, each row corresponding to one region.
 }
 \description{
-Reduce several beta values from different CpG sites to single beta values
-associated to one genomic region (such as CpG islands) where CpG sites are located.
+Reduce several beta values from different CpG sites to a single beta value
+associated to one genomic region (such as CpG islands).
 Different technologies retrieve DNA methylation levels of
-different CpG sites. This function makes a direct comparison possible.
+different CpG sites. This function makes possible a direct comparison.
 }
 \examples{
-reduced_data <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands[1:10,])
+reduced_data <- reduce_to_regions(bs_seq_toy_matrix, bs_seq_toy_sites, cpg_islands[1:10,])
 }

@@ -1,27 +1,24 @@
 Package: PAMES
-Date: 2021-12-01
-Type: Package
 Title: Purity Assessment from clonal MEthylation Sites
-Description: Exploiting data from DNA methylation, this package provides the operations
-    required to evaluate the purity of tumor samples.
-Version: 2.7.2
+Description: Exploiting data from DNA methylation, this package provides the
+    operations required to evaluate the purity of tumor samples.
+Version: 3.0.0
 Authors@R: c(person("Dario", "Romagnoli", role=c("aut", "cre"),
   email="dario.romagnoli87@gmail.com"),
   person("Matteo", "Benelli", role="aut"),
   person("Francesca", "Demichelis", role="aut"))
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.0.0)
 Imports:
-    parallel,
-    S4Vectors,
+    assertthat,
     GenomicRanges,
     IRanges,
-    assertthat,
-    dplyr
+    parallel,
+    S4Vectors,
 Suggests:
     knitr,
     rmarkdown,
     testthat
-License: GPL-3 | file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.0

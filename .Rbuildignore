@@ -4,3 +4,4 @@
 ^README-.*\.png$
 ^data-raw/$
 ^TODO\.md$
+^LICENSE\.md$

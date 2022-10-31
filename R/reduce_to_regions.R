@@ -1,28 +1,27 @@
 #' Reduce beta values from CpG sites to genomic regions
 #'
-#' Reduce several beta values from different CpG sites to single beta values
-#' associated to one genomic region (such as CpG islands) where CpG sites are located.
+#' Reduce several beta values from different CpG sites to a single beta value
+#' associated to one genomic region (such as CpG islands).
 #' Different technologies retrieve DNA methylation levels of
-#' different CpG sites. This function makes a direct comparison possible.
+#' different CpG sites. This function makes possible a direct comparison.
 #'
-#' @param beta_table A matrix of beta-values (percentage).
+#' @param beta_table A matrix of beta-values.
 #' @param cpg_sites A data.frame reporting the genomic location of CpG sites.
 #' @param cpg_regions A data.frame reporting the genomic location of genomic regions.
-#' @param min_CpGs An integer (default to 3). Minimum number of CpG sites
-#' within a single genomic region required to compute the reduced beta value
-#' (return NA otherwise).
-#' @param method Take `median` or `mean`of CpG sites.
-#' @return A matrix of beta values (nrow == length(cpg_indexes)).
+#' @param min_CpGs An integer (default=3). Minimum number of CpG sites
+#' within a single genomic region (return NA otherwise).
+#' @param method Function to summarise a region: either `median` or `mean` (default=median).
+#' @return A matrix of beta values, each row corresponding to one region.
 #' @importFrom stats median
 #' @export
 #' @examples
-#' reduced_data <- reduce_to_regions(bs_toy_matrix, bs_toy_sites, cpg_islands[1:10,])
+#' reduced_data <- reduce_to_regions(bs_seq_toy_matrix, bs_seq_toy_sites, cpg_islands[1:10,])
 reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3, method=c("median", "mean")){
 
     message(sprintf("[%s] # Reduce to regions #", Sys.time()))
     # check parameters
     method <- match.arg(method)
-    min_CpGs <- as.integer(min_CpGs)
+    assertthat::assert_that(is.numeric(min_CpGs))
     assertthat::assert_that(min_CpGs > 0)
     assertthat::assert_that(ncol(cpg_sites) >= 2)
     assertthat::assert_that(ncol(cpg_regions) >= 3)
@@ -55,7 +54,8 @@ reduce_to_regions <- function(beta_table, cpg_sites, cpg_regions, min_CpGs = 3, 
     subject_hits <- S4Vectors::subjectHits(overlaps)
     query_hits <- S4Vectors::queryHits(overlaps)
     idx_list <- tapply(subject_hits, query_hits, function(idx) return(idx))
-    above_thr_regions <- which(sapply(idx_list, length) >= min_CpGs) # skip regions with not enough sites
+    # skip regions with not enough sites
+    above_thr_regions <- which(sapply(idx_list, length) >= min_CpGs)
 
     if (length(above_thr_regions) == 0){
         message(sprintf("[%s] No region overlaps enough sites",  Sys.time()))

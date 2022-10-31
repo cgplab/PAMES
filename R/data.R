@@ -38,12 +38,12 @@
 #' @source \url{https://genome.ucsc.edu/}
 "cpg_islands"
 
-#' BS Toy data
+#' BS-Seq Toy data
 #'
 #' Example of tumor and control beta values from Bisulphite Sequencing
-"bs_toy_matrix"
+"bs_seq_toy_matrix"
 
-#' BS Toy sites
+#' BS-Seq Toy sites
 #'
 #' Example of data.frame with location of CpG sites
-"bs_toy_sites"
+"bs_seq_toy_sites"
