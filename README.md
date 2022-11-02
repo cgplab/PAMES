@@ -21,7 +21,7 @@ devtools::install_github("cgplab/PAMES")
 
 To install the previous version of PAMES use:
 
-```{r gh-installation, eval = FALSE}
+``` r 
 # install.packages("devtools")
 devtools::install_github("cgplab/PAMES", ref='v2.7.2')
 ```
